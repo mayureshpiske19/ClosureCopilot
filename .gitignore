@@ -22,3 +22,8 @@ Thumbs.db
 
 # Local run artifacts
 .streamlit_run.log
+
+# Video build intermediates (regenerable)
+docs/video/audio/
+docs/video/voice.wav
+docs/video/frames.txt
