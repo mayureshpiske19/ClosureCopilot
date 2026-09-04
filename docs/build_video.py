@@ -9,7 +9,7 @@ VO = os.path.join(HERE, "video", "vo")
 FRAMES = os.path.join(HERE, "video")
 OUT = os.path.join(HERE, "ClosureCopilot_demo.mp4")
 FF = imageio_ffmpeg.get_ffmpeg_exe()
-TARGET = 120.0
+TARGET = 119.0
 
 meta = json.load(open(os.path.join(VO, "meta.json")))
 durs = [m["dur"] for m in meta]
