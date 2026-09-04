@@ -7,8 +7,6 @@
 > the RTL engineer **exactly where to fix each issue: RTL, constraints (SDC), or UPF** —
 > with corrected, copy-paste-ready snippets. Including IP→top constraint promotion.
 
-Hackathon 2026 · Category: *AI in Action: AI-Native Engineering* · HW domain.
-
 ---
 
 ## Why it matters
@@ -63,4 +61,4 @@ Without Azure credentials the app runs in **offline mode** with deterministic an
 over the bundled sample reports in `data/samples/`.
 
 ## Status
-Prototype under active development for Hackathon 2026. See project board / plan for phases.
+Prototype under active development. See the project plan for phases.
