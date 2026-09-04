@@ -1,0 +1,7 @@
+streamlit>=1.36
+openai>=1.40
+chromadb>=0.5
+pydantic>=2.7
+python-dotenv>=1.0
+pandas>=2.2
+tiktoken>=0.7

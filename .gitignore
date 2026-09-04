@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Env / secrets
+.env
+*.key
+
+# RAG vector store (regenerated)
+.chroma/
+data/knowledge/**/index/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
