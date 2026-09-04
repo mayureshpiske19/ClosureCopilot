@@ -64,8 +64,6 @@ d.rectangle([0, 700, W, 716], fill=BLUE)
 d.text((130, 300), "ClosureCopilot", font=B(120), fill=WHITE)
 d.text((136, 460), "A Multi-Agent Backend Closure Copilot for RTL", font=B(50), fill=(191, 212, 242))
 d.text((136, 560), "It decides WHERE each fix belongs  —  RTL  ·  SDC  ·  UPF", font=R(38), fill=(159, 184, 224))
-d.text((136, 900), "AI-Native Engineering    |    github.com/mayureshpiske19/ClosureCopilot",
-       font=R(28), fill=(143, 166, 200))
 save(img, 1)
 
 # F2 — problem

@@ -69,9 +69,6 @@ text(s, Inches(0.95), Inches(3.35), Inches(11.5), Inches(0.8),
      [("A Multi-Agent Backend Closure Copilot for RTL", 26, RGBColor(0xBF, 0xD4, 0xF2), True)])
 text(s, Inches(0.95), Inches(4.2), Inches(11.5), Inches(0.8),
      [("It decides WHERE each fix belongs — RTL  ·  SDC  ·  UPF", 20, RGBColor(0x9F, 0xB8, 0xE0), False)])
-text(s, Inches(0.95), Inches(6.4), Inches(11.5), Inches(0.5),
-     [("AI in Action: AI-Native Engineering   |   github.com/mayureshpiske19/ClosureCopilot",
-       14, RGBColor(0x8F, 0xA6, 0xC8), False)])
 
 # ---- Slide 2 : Problem ----
 s = slide(); bg(s); header(s, "The problem: PPA closure doesn't scale", RED)
