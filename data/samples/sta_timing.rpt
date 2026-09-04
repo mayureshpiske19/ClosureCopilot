@@ -1,0 +1,46 @@
+# STA Timing Report (PrimeTime-style)  --  design: soc_top  corner: ss_0p72v_125c
+# Generated for ClosureCopilot demo (synthetic data)
+# ---------------------------------------------------------------
+
+Startpoint: cfg_reg_q_reg[3] (rising edge-triggered flip-flop clocked by clk_cfg)
+Endpoint:   status_reg_q_reg[3] (rising edge-triggered flip-flop clocked by clk_cfg)
+Path Group: clk_cfg
+Path Type:  max
+  data required time      2.500
+  data arrival time       2.900
+  slack (VIOLATED)       -0.400
+  Note: source register updated once per configuration write (block cfg_ctrl)
+
+Startpoint: alu_opa_reg[15] (rising edge-triggered flip-flop clocked by clk_core)
+Endpoint:   alu_res_reg[15] (rising edge-triggered flip-flop clocked by clk_core)
+Path Group: clk_core
+Path Type:  max
+  logic depth             27
+  data required time      1.000
+  data arrival time       1.180
+  slack (VIOLATED)       -0.180
+  RTL: alu.sv:210  (deep combinational cone, no pipeline register)
+
+Startpoint: usb_tx_reg[0] (rising edge-triggered flip-flop clocked by clk_usb)
+Endpoint:   usb_phy_reg[0] (rising edge-triggered flip-flop clocked by clk_usb)
+Path Group: clk_usb
+Path Type:  max
+  data required time      8.000
+  data arrival time       9.900
+  slack (VIOLATED)       -1.900
+  Note: clock clk_usb defined at 10.0ns in usb_ip.sdc but top maps port to clk_120m (8.33ns)
+
+Startpoint: spi_din_reg[2] (rising edge-triggered flip-flop clocked by clk_core)
+Endpoint:   spi_dout_reg[2] (rising edge-triggered flip-flop clocked by clk_core)
+Path Group: clk_core
+Path Type:  max
+  data required time      1.000
+  data arrival time       0.940
+  slack (MET)             0.060
+
+# Summary
+WNS (clk_core): -0.180
+WNS (clk_cfg):  -0.400
+WNS (clk_usb):  -1.900
+TNS:            -2.480
+Failing endpoints: 3

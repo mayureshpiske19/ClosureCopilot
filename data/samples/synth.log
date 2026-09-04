@@ -1,0 +1,16 @@
+# Synthesis Log (Genus/DC-style)  --  design: soc_top
+# Generated for ClosureCopilot demo (synthetic data)
+# ---------------------------------------------------------------
+Info: Reading RTL elaborated design 'soc_top'
+Info: Applying constraints from soc_top.sdc
+
+Warning: Cannot find library cell for operator 'XOR4' in module crc_gen [SYNTH-201]
+Warning: 3 cells left unmapped in module crc_gen (target library missing XOR4) [SYNTH-201]
+Warning: Inferred latch for signal 'state_next' in module fsm_ctrl (fsm_ctrl.sv:88) -- missing default assignment in case [LATCH-301]
+Warning: Inferred latch for signal 'decode_out' in module decoder (decoder.sv:44) -- incomplete if/else [LATCH-301]
+Warning: Signal 'dma_clk_en' unconnected; clock-gating cell not inferred for module dma_ctrl (dma_ctrl.sv:142) [CG-410]
+Warning: Multiple driver contention avoided by don't_touch on net 'test_mode' [DRC-120]
+Info: Total cells mapped: 48213
+Info: Total unmapped: 3
+Info: Inferred latches: 2
+Info: Clock gating cells inserted: 12 (opportunities detected: 15)

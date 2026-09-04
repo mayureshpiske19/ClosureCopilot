@@ -1,0 +1,24 @@
+# UPF Power Intent  --  design: soc_top
+# Generated for ClosureCopilot demo (synthetic data)
+# ---------------------------------------------------------------
+upf_version 2.1
+set_design_top soc_top
+
+# Power domains
+create_power_domain PD_TOP
+create_power_domain PD_DMA   -elements {dma_ctrl}
+create_power_domain PD_USB   -elements {usb_ip}
+
+# Supply nets
+create_supply_net  VDD_AO   -domain PD_TOP
+create_supply_net  VDD_SW   -domain PD_DMA
+create_supply_port VDD_AO
+create_supply_port VDD_SW
+
+# Intended clock gating on dma_ctrl (see note)
+# set_clock_gating_style intended for PD_DMA -- NOT realized in netlist (dma_clk_en unconnected)
+
+# NOTE (intentional gaps for demo):
+#  - PD_DMA outputs crossing to PD_TOP have NO isolation strategy defined
+#  - PD_USB has no retention strategy defined for state registers
+#  - dma_ctrl clock gating intent present but enable not wired in RTL (dma_ctrl.sv:142)

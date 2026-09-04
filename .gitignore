@@ -19,3 +19,6 @@ data/knowledge/**/index/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local run artifacts
+.streamlit_run.log

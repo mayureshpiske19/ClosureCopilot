@@ -1,0 +1,15 @@
+# Area Report  --  design: soc_top
+# Generated for ClosureCopilot demo (synthetic data)
+# columns: instance  cell_count  comb_area(um2)  seq_area(um2)  total_area(um2)  util(%)
+# ---------------------------------------------------------------
+soc_top       48213   182400.0   96200.0   278600.0   72.0
+  alu          9800    41200.0   12800.0    54000.0   81.0
+  crc_gen      6100    28900.0    4200.0    33100.0   88.0
+  dma_ctrl     5400    16800.0    9600.0    26400.0   64.0
+  usb_ip       7200    19400.0   11200.0    30600.0   70.0
+  pipe_stage3  4300    14100.0    8800.0    22900.0   61.0
+  decoder      3900    15600.0    2100.0    17700.0   77.0
+  spi_ctrl     2100     6800.0    3100.0     9900.0   55.0
+
+# Notes
+# crc_gen utilization 88% -- congestion risk; large combinational (XOR tree) block
