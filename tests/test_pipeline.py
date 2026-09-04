@@ -44,6 +44,38 @@ def test_upf_isolation_routes_to_upf():
     assert iso and any(it.fix.layer == LAYER_UPF for it in iso)
 
 
+# ---- product modules -----------------------------------------------------
+from closurecopilot import config
+from closurecopilot.modules import promotion, regression, physical, upf_signoff
+
+
+def test_constraint_promotion_detects_mismatches():
+    items = promotion.run_on_samples(config.SAMPLES_DIR)
+    assert len(items) >= 3
+    # clk_usb has no top match -> promotion finding routed to SDC
+    assert any("clk_usb" in it.finding.title and it.fix.layer == LAYER_SDC for it in items)
+
+
+def test_regression_attributes_to_commit():
+    items = regression.run_on_samples(config.SAMPLES_DIR)
+    pipe = [it for it in items if "pipe_stage3" in it.finding.location]
+    assert pipe, "expected pipe_stage3 power regression"
+    assert any("commit" in it.finding.metrics for it in pipe)
+
+
+def test_physical_flags_congestion_hotspots():
+    items = physical.run_on_samples(config.SAMPLES_DIR)
+    assert any("crc_gen" in it.finding.location for it in items)
+    assert all(it.fix.layer == LAYER_RTL for it in items)
+
+
+def test_upf_signoff_checklist_has_failures():
+    items = upf_signoff.run_on_samples(config.SAMPLES_DIR)
+    rows = upf_signoff.checklist(items)
+    assert len(rows) == 3
+    assert any("FAIL" in status for _, status, _ in rows)
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -1,0 +1,12 @@
+# Place-and-Route Congestion Report  --  design: soc_top
+# columns: instance  util(%)  peak_congestion(%)  overflow_gcells  hotspot
+soc_top       72.0   61.0    0     no
+  crc_gen      88.0   96.0   214    yes
+  alu          81.0   78.0    12    no
+  decoder      77.0   90.0    88    yes
+  dma_ctrl     64.0   40.0     0    no
+  usb_ip       70.0   55.0     0    no
+
+# Notes
+# crc_gen: peak congestion 96% (overflow 214) -- wide XOR tree, physically unfriendly.
+# decoder: peak congestion 90% (overflow 88) -- large one-hot decode fanout.

@@ -1,0 +1,5 @@
+# STA WNS summary  --  RUN: baseline (commit a1b2c3)
+# columns: clock  wns(ns)  tns(ns)  failing_endpoints
+clk_core   -0.020   -0.040   1
+clk_cfg    -0.400   -0.400   1
+clk_usb    -1.900   -1.900   1

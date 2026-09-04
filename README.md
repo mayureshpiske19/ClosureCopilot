@@ -23,6 +23,18 @@ decides whether a fix belongs in RTL, constraints, or UPF.** ClosureCopilot does
 5. **Dual-RAG** — global PPA knowledge + a persistent *Design Context Memory* (specs,
    micro-arch, past reports) so feedback is grounded in *your* design and improves over time.
 
+## Product modules
+A unified suite of backend-closure agents surfaced as one dashboard:
+
+| Module | What it does |
+|--------|--------------|
+| **PPA Analyzer** | Ranked findings + fix-routing across power / timing / area / synthesis |
+| **Constraint Promotion** | Reconciles IP/block SDC against top; flags clock/budget/exception mismatches; emits corrected top constraints |
+| **UPF Signoff** | Power-intent counterpart to an SDC checker — isolation / retention / clock-gating checks with corrected UPF |
+| **Regression Detective** | Diffs two backend runs and attributes each PPA regression to the commit that caused it ("git-blame for PPA") |
+| **Physical-Aware Feedback** | Reads P&R congestion and returns RTL restructuring hints (physical → RTL gap) |
+
+
 ## Architecture
 ```
 Designer ──> Supervisor / Orchestrator

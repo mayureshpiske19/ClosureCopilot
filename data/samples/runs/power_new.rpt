@@ -1,0 +1,10 @@
+# RTLA Power Report  --  design: soc_top  mode: active  RUN: new (commit a3f9d0)
+# columns: instance  internal(mW)  switching(mW)  leakage(mW)  clock(mW)  total(mW)
+soc_top             13.300   18.900   3.100   9.800   45.100
+  dma_ctrl           1.100    2.300   0.400   4.900    8.700
+  alu                3.400    5.300   0.600   0.900   10.200
+  pipe_stage3        2.900    4.100   0.500   0.700    8.200
+  usb_ip             1.800    2.400   0.700   1.100    6.000
+  crc_gen            1.500    3.100   0.300   0.500    5.400
+  spi_ctrl           0.900    1.100   0.300   0.900    3.200
+  cfg_ctrl           0.800    0.600   0.300   0.800    2.500

@@ -1,0 +1,5 @@
+# Commit log (block -> last touching commit)  --  synthetic
+# columns: block  commit  author  subject
+pipe_stage3  a3f9d0  mayuresh  "pipe_stage3: widen datapath, drop pipeline reg"
+alu          a1b2c3  team      "alu: baseline"
+dma_ctrl     9f0011  team      "dma_ctrl: buffer update"
