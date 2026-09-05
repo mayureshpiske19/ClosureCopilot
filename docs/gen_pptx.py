@@ -57,6 +57,15 @@ def header(s, title, accent=PRIMARY):
     rect(s, 0, 0, SW, Inches(1.15), accent)
     text(s, Inches(0.6), Inches(0.18), Inches(12), Inches(0.8),
          [(title, 30, WHITE, True)], anchor=MSO_ANCHOR.MIDDLE)
+    footer(s)
+
+
+def footer(s):
+    tb = s.shapes.add_textbox(Inches(6.0), Inches(7.08), Inches(7.13), Inches(0.32))
+    tf = tb.text_frame; tf.word_wrap = False
+    p = tf.paragraphs[0]; p.alignment = PP_ALIGN.RIGHT
+    r = p.add_run(); r.text = "ClosureCopilot · Mayuresh Piske · © 2026 Microsoft"
+    r.font.size = Pt(9); r.font.color.rgb = GRAY; r.font.name = "Segoe UI"
 
 
 # ---- Slide 1 : Title ----

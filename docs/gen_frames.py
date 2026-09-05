@@ -52,6 +52,14 @@ def para(d, x, y, text, fnt, color, maxw, lh):
 def header(d, title, color=BLUE):
     d.rectangle([0, 0, W, 150], fill=color)
     d.text((70, 40), title, font=B(52), fill=WHITE)
+    footer(d)
+
+
+def footer(d):
+    txt = "ClosureCopilot  ·  Mayuresh Piske  ·  © 2026 Microsoft"
+    fnt = R(24)
+    tw = d.textlength(txt, font=fnt)
+    d.text((W - 60 - tw, H - 46), txt, font=fnt, fill=(150, 160, 175))
 
 
 def save(img, n):
