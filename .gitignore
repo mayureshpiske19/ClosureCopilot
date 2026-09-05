@@ -25,3 +25,5 @@ Thumbs.db
 
 # Video build intermediates (regenerable — keep only the final mp4 at docs/)
 docs/video/
+
+docs/pptx_slides/
