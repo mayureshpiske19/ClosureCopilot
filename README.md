@@ -56,6 +56,25 @@ Tools:      MCP layer wrapping backend tools (replay-safe for demo)
 Python 3.12 · Streamlit UI · ChromaDB (dual RAG) · Azure OpenAI (with a deterministic
 **offline mode** so the demo runs even without credentials).
 
+## Results dashboard (zero-install)
+
+For a fast, dependency-free view of the analysis, open **[`docs/dashboard.html`](docs/dashboard.html)**
+directly in any browser — a self-contained page (data embedded, works offline, no server).
+
+![ClosureCopilot dashboard](docs/dashboard.png)
+
+It has seven tabs — **Overview · PPA Analyzer · Constraint Promotion · UPF Signoff ·
+Regression Detective · Physical-Aware · Ask** — with KPI cards, a supervisor summary,
+cross-domain insights, severity/fix-layer charts, and ranked finding cards (each with the
+fix-layer badge, corrected snippet, PPA trade-off, and grounding references). The **Ask**
+tab answers plain-English questions over the findings, fully offline.
+
+Regenerate it from the live pipeline anytime:
+```powershell
+python docs/export_results.py   # runs the analysis -> docs/results.json
+python docs/build_dashboard.py  # renders docs/dashboard.html
+```
+
 ## Quick start
 ```powershell
 # from the ClosureCopilot folder
