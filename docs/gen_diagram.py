@@ -55,7 +55,7 @@ ax.text(50, 94.0, "any backend report in    →    ranked, fix-routed findings o
 inputs=["STA\nTiming","Synthesis\nlog","RTLA\npower","Area","UPF","SDC","P&R\ncongestion"]
 n=len(inputs); iw=11.6; ig=1.7
 itot=n*iw+(n-1)*ig; ix0=(100-itot)/2
-ax.text(50, 90.4, "BACKEND REPORTS  ·  data/samples", ha="center", color=SOFT, fontsize=11, fontweight="bold")
+ax.text(ix0, 90.7, "BACKEND REPORTS  ·  data/samples", ha="left", color=SOFT, fontsize=11, fontweight="bold")
 IN=[box(ix0+i*(iw+ig), 83.4, iw, 6.4, t, INPUT, INPUT_BG, fs=11) for i,t in enumerate(inputs)]
 
 # ---------- 2) ingestion (spans full inputs width) — direct arrow from EACH input ----------
@@ -78,7 +78,7 @@ ax.text((KB_B["l"]+S["r"])/2, midS+1.5, "ground", ha="center", color=SOFT, fonts
 agents=["Power","Timing","Area","Synthesis","UPF","Constraints"]
 m=len(agents); aw=12.6; ag=1.6
 atot=m*aw+(m-1)*ag; ax0=(100-atot)/2
-ax.text(50, 60.0, "SPECIALIST AGENTS  ·  agents/base.py", ha="center", color=SOFT, fontsize=10.5, fontweight="bold")
+ax.text(ax0, 61.7, "SPECIALIST AGENTS  ·  agents/base.py", ha="left", color=SOFT, fontsize=10.5, fontweight="bold")
 AG=[box(ax0+i*(aw+ag), 51.8, aw, 5.8, t, AGENT, AGENT_BG, fs=12) for i,t in enumerate(agents)]
 acx=[b["cx"] for b in AG]
 trunkY=59.0
@@ -114,7 +114,7 @@ rx=pnl_l+3.2; midFX=(FX["t"]+FX["b"])/2
 seg(rx, 26.4, rx, midFX, c=REUSE, w=1.7, dashed=True)
 seg(rx, midFX, FX["l"], midFX, c=REUSE, w=1.7, dashed=True)
 head(FX["l"], midFX, "right", c=REUSE)
-ax.text(rx+1.7, midFX+2.2, "reuse", ha="left", color=REUSE, fontsize=10.5, style="italic")
+ax.text(rx+1.6, (26.4+midFX)/2, "reuse", ha="left", va="center", color=REUSE, fontsize=11, style="italic", fontweight="bold")
 
 plt.tight_layout()
 plt.savefig("docs/architecture.png", dpi=180, facecolor="white", bbox_inches="tight")
