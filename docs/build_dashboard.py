@@ -174,6 +174,7 @@ const TABS = [
   {id:'upf', label:'⚡ UPF Signoff'},
   {id:'regression', label:'📉 Regression Detective'},
   {id:'physical', label:'🧱 Physical-Aware'},
+  {id:'ask', label:'💬 Ask'},
 ];
 const tabsEl=document.getElementById('tabs'), panelsEl=document.getElementById('panels');
 tabsEl.innerHTML = TABS.map((t,i)=>`<div class="tab ${i===0?'active':''}" data-t="${t.id}">${t.label}</div>`).join('');
@@ -228,10 +229,32 @@ function upfPanel(){
     <div class="sec-h" style="margin-top:14px">Findings</div>${modPanel('upf')}`;
 }
 
+function askPanel(){
+  const examples = [
+    "Which issues should I fix in constraints vs RTL?",
+    "What are the high clock power problems?",
+    "Show me everything about dma_ctrl",
+    "Which fixes go in UPF?",
+    "What timing violations exist?",
+  ];
+  return `<div class="card">
+    <div class="sec-h">Ask the copilot <span style="color:var(--mut);text-transform:none;letter-spacing:0">(offline — searches the ${allItems.length} findings)</span></div>
+    <div style="display:flex;gap:8px;margin:10px 0">
+      <input id="askIn" placeholder="e.g. Which issues should I fix in constraints vs RTL?"
+        style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+        background:#0e1830;color:var(--ink);font-size:14px;font-family:inherit"/>
+      <button id="askBtn" style="padding:12px 22px;border:0;border-radius:10px;cursor:pointer;
+        font-weight:700;color:#fff;background:linear-gradient(135deg,var(--blue),var(--violet))">Ask</button>
+    </div>
+    <div class="filters">${examples.map(q=>`<div class="chip" data-q="${q.replace(/"/g,'&quot;')}">${q}</div>`).join('')}</div>
+  </div>
+  <div id="askOut"></div>`;
+}
+
 const PANEL_HTML = {
   overview, ppa:ppaPanel(), promotion:modPanel('promotion'),
   upf:upfPanel(), regression:modPanel('regression')||'<div class="card">No regressions.</div>',
-  physical:modPanel('physical'),
+  physical:modPanel('physical'), ask:askPanel(),
 };
 panelsEl.innerHTML = TABS.map((t,i)=>
   `<div class="panel ${i===0?'active':''}" data-p="${t.id}">${PANEL_HTML[t.id]}</div>`).join('');
@@ -250,6 +273,43 @@ panelsEl.addEventListener('click',e=>{
   const d=c.dataset.d;
   document.querySelectorAll('#ppaList .card').forEach(card=>{
     card.style.display=(d==='all'||card.dataset.domain===d)?'':'none';});
+});
+
+// ---- Ask (offline keyword Q&A over the embedded findings) ----
+const STOP = new Set("the a an of to in on is are and or for with by as at be this that it its what which how show me my all i should do does can you give find are there about".split(" "));
+function runAsk(q){
+  const out=document.getElementById('askOut'); if(!out)return;
+  const terms=q.toLowerCase().match(/[a-z_][a-z0-9_]+/g)||[];
+  const kw=terms.filter(t=>!STOP.has(t));
+  // layer-intent shortcuts
+  const wantLayer = /constraint|sdc/.test(q.toLowerCase())?'SDC (constraints)'
+    : /\bupf\b|power intent|isolation|retention/.test(q.toLowerCase())?'UPF (power intent)'
+    : /\brtl\b/.test(q.toLowerCase())?'RTL':null;
+  let scored = allItems.map(it=>{
+    const hay=(it.title+" "+it.detail+" "+it.location+" "+(it.fix?it.fix.layer+" "+it.fix.rationale:"")).toLowerCase();
+    let s=kw.reduce((a,t)=>a+(hay.includes(t)?1:0),0);
+    if(wantLayer && it.fix && it.fix.layer===wantLayer) s+=2;
+    return {it,s};
+  }).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+  if(!scored.length) scored = allItems.slice(0,6).map(it=>({it,s:0}));
+  const hits=scored.slice(0,8).map(x=>x.it);
+  const byLayer={};
+  hits.forEach(it=>{if(it.fix){(byLayer[it.fix.layer]=byLayer[it.fix.layer]||[]).push(it.title);}});
+  const ans = Object.entries(byLayer).map(([L,arr])=>
+    `<b style="color:#fff">Fix in ${esc(L)}:</b><ul style="margin:6px 0">${arr.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`).join('');
+  out.innerHTML =
+    `<div class="card"><div class="loc">🟡 offline answer · matched ${hits.length} finding(s)</div>
+      ${ans||'<div>No matching findings.</div>'}</div>` +
+    hits.map(itemCard).join('');
+  out.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+panelsEl.addEventListener('click',e=>{
+  const b=e.target.closest('#askBtn'); const c=e.target.closest('[data-p="ask"] .chip');
+  if(b){const v=document.getElementById('askIn').value.trim(); if(v)runAsk(v);}
+  else if(c){const q=c.dataset.q; const inp=document.getElementById('askIn'); if(inp)inp.value=q; runAsk(q);}
+});
+panelsEl.addEventListener('keydown',e=>{
+  if(e.target.id==='askIn' && e.key==='Enter'){const v=e.target.value.trim(); if(v)runAsk(v);}
 });
 </script>
 </body>
