@@ -97,13 +97,11 @@ for b in bullets:
 # ---- Slide 3 : What it does (architecture) ----
 s = slide(); bg(s); header(s, "One copilot · 9 agents · any backend report")
 try:
-    s.shapes.add_picture("docs/architecture.png", Inches(1.2), Inches(1.35),
-                         width=Inches(11.0))
+    # center the diagram, sized to fit under the header without overlapping the footer
+    s.shapes.add_picture("docs/architecture.png", Inches(2.35), Inches(1.28),
+                         height=Inches(5.75))
 except Exception as e:
     text(s, Inches(1), Inches(3), Inches(11), Inches(1), [(f"[diagram] {e}", 14, GRAY, False)])
-text(s, Inches(0.7), Inches(6.95), Inches(12), Inches(0.4),
-     [("Tool-agnostic parsers normalize STA · synthesis · power · area · UPF · SDC · congestion into one finding model.",
-       13, GRAY, False)], align=PP_ALIGN.CENTER)
 
 # ---- Slide 4 : Fix-layer routing ----
 s = slide(); bg(s); header(s, "The core idea: Fix-Layer Routing", PURPLE)

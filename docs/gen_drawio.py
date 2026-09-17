@@ -1,103 +1,84 @@
-"""Generate a clean white-theme draw.io architecture diagram for ClosureCopilot."""
+"""Generate an accurate white-theme draw.io architecture diagram for ClosureCopilot."""
 import html
 
 # id, label, x, y, w, h, fill, stroke
 NODES = [
-    ("t", "ClosureCopilot  —  Multi-Agent Backend Closure Copilot for RTL",
-     380, 30, 740, 40, "none", "none"),
-    # inputs (fill light blue)
-    ("i1", "STA Timing", 101, 110, 170, 60, "#DAE8FC", "#6C8EBF"),
-    ("i2", "Synthesis Log", 289, 110, 170, 60, "#DAE8FC", "#6C8EBF"),
-    ("i3", "RTLA Power", 477, 110, 170, 60, "#DAE8FC", "#6C8EBF"),
-    ("i4", "Area Report", 665, 110, 170, 60, "#DAE8FC", "#6C8EBF"),
-    ("i5", "UPF", 853, 110, 170, 60, "#DAE8FC", "#6C8EBF"),
-    ("i6", "SDC", 1041, 110, 170, 60, "#DAE8FC", "#6C8EBF"),
-    ("i7", "P&amp;R Congestion", 1229, 110, 170, 60, "#DAE8FC", "#6C8EBF"),
+    ("t", "ClosureCopilot — Architecture &amp; Data Flow", 380, 24, 740, 40, "none", "none"),
+    # inputs
+    ("i1","STA Timing",101,100,168,58,"#DAE8FC","#6C8EBF"),
+    ("i2","Synthesis log",287,100,168,58,"#DAE8FC","#6C8EBF"),
+    ("i3","RTLA power",473,100,168,58,"#DAE8FC","#6C8EBF"),
+    ("i4","Area",659,100,168,58,"#DAE8FC","#6C8EBF"),
+    ("i5","UPF",845,100,168,58,"#DAE8FC","#6C8EBF"),
+    ("i6","SDC",1031,100,168,58,"#DAE8FC","#6C8EBF"),
+    ("i7","P&amp;R congestion",1217,100,168,58,"#DAE8FC","#6C8EBF"),
     # parser
-    ("parser", "Ingestion / Parser Agent  —  tool-agnostic report normalizer",
-     230, 220, 1040, 55, "#D5E8D4", "#82B366"),
-    # supervisor + side panels
-    ("sup", "Supervisor / Orchestrator", 570, 325, 360, 62, "#E1D5E7", "#9673A6"),
-    ("azure", "Azure OpenAI\n(deterministic offline fallback)", 150, 328, 210, 56,
-     "#F5F5F5", "#999999"),
-    ("rag", "Dual-RAG\nGlobal PPA KB + Design Context Memory", 1140, 328, 210, 56,
-     "#B0E3E6", "#0E8088"),
+    ("parser","Ingestion / Parser Agent&#10;ingestion/parsers.py · detect_type() → Finding objects",
+     230,205,1040,58,"#D5E8D4","#82B366"),
+    # supervisor + side
+    ("sup","Supervisor / Orchestrator&#10;orchestrator.py",560,310,360,64,"#E1D5E7","#9673A6"),
+    ("az","Azure OpenAI&#10;llm.py · optional",120,312,210,60,"#F5F5F5","#999999"),
+    ("kb","Grounded knowledge&#10;rag/ · design + global",1150,312,210,60,"#B0E3E6","#0E8088"),
     # agents
-    ("a1", "Power Agent", 105, 445, 200, 55, "#F5F5F5", "#666666"),
-    ("a2", "Timing Agent", 323, 445, 200, 55, "#F5F5F5", "#666666"),
-    ("a3", "Area Agent", 541, 445, 200, 55, "#F5F5F5", "#666666"),
-    ("a4", "Synthesis Agent", 759, 445, 200, 55, "#F5F5F5", "#666666"),
-    ("a5", "UPF Agent", 977, 445, 200, 55, "#F5F5F5", "#666666"),
-    ("a6", "Constraints Agent", 1195, 445, 200, 55, "#F5F5F5", "#666666"),
-    # fix engine
-    ("fix", "Fix-Routing / Diagnosis Engine  —  RTL | SDC | UPF | Synth-setup",
-     350, 560, 800, 58, "#F8CECC", "#B85450"),
-    # modules
-    ("m1", "PPA Analyzer", 135, 670, 230, 66, "#FFE6CC", "#D79B00"),
-    ("m2", "Constraint Promotion", 385, 670, 230, 66, "#FFE6CC", "#D79B00"),
-    ("m3", "UPF Signoff", 635, 670, 230, 66, "#FFE6CC", "#D79B00"),
-    ("m4", "Regression Detective", 885, 670, 230, 66, "#FFE6CC", "#D79B00"),
-    ("m5", "Physical-Aware Feedback", 1135, 670, 230, 66, "#FFE6CC", "#D79B00"),
-    # output + designer
-    ("out", "Ranked findings  +  corrected snippets (RTL / SDC / UPF)  +  PPA trade-offs",
-     230, 785, 1040, 58, "#D5E8D4", "#82B366"),
-    ("des", "RTL Designer", 620, 895, 260, 55, "#FFF2CC", "#D6B656"),
+    ("a1","Power",130,430,190,54,"#EEF0F4","#666666"),
+    ("a2","Timing",345,430,190,54,"#EEF0F4","#666666"),
+    ("a3","Area",560,430,190,54,"#EEF0F4","#666666"),
+    ("a4","Synthesis",775,430,190,54,"#EEF0F4","#666666"),
+    ("a5","UPF",990,430,190,54,"#EEF0F4","#666666"),
+    ("a6","Constraints",1205,430,190,54,"#EEF0F4","#666666"),
+    # fix router
+    ("fix","Fix-Routing / Diagnosis Engine&#10;fix_router.py · RTL | SDC | UPF | Synth  +  snippet + trade-off",
+     360,540,800,60,"#F8CECC","#B85450"),
+    # output
+    ("out","Ranked findings (AnalysisResult)&#10;Streamlit app · HTML dashboard · CLI",
+     440,650,640,58,"#D5E8D4","#82B366"),
+    # module lane
+    ("m1","Constraint Promotion&#10;promotion.py",180,780,250,60,"#FFE6CC","#D79B00"),
+    ("m2","UPF Signoff&#10;upf_signoff.py",470,780,250,60,"#FFE6CC","#D79B00"),
+    ("m3","Regression Detective&#10;regression.py",760,780,250,60,"#FFE6CC","#D79B00"),
+    ("m4","Physical-Aware&#10;physical.py",1050,780,250,60,"#FFE6CC","#D79B00"),
 ]
 
-# edges: (source, target, exitX, entryX, dashed)   exitY=1, entryY=0 for vertical flow
-EDGES = []
-for i in range(1, 8):                       # inputs -> parser (spread entry)
-    EDGES.append((f"i{i}", "parser", 0.5, (i - 0.5) / 7, 0))
-EDGES.append(("parser", "sup", 0.5, 0.5, 0))
-for j in range(1, 7):                        # supervisor -> agents (spread exit)
-    EDGES.append(("sup", f"a{j}", (j - 0.5) / 6, 0.5, 0))
-for j in range(1, 7):                        # agents -> fix (spread entry)
-    EDGES.append((f"a{j}", "fix", 0.5, (j - 0.5) / 6, 0))
-for k in range(1, 6):                        # fix -> modules (spread exit)
-    EDGES.append(("fix", f"m{k}", (k - 0.5) / 5, 0.5, 0))
-for k in range(1, 6):                        # modules -> output (spread entry)
-    EDGES.append((f"m{k}", "out", 0.5, (k - 0.5) / 5, 0))
-EDGES.append(("out", "des", 0.5, 0.5, 0))
+# solid main-pipeline edges (source, target)
+SOLID = [("i1","parser"),("i2","parser"),("i3","parser"),("i4","parser"),
+         ("i5","parser"),("i6","parser"),("i7","parser"),
+         ("parser","sup"),
+         ("sup","a1"),("sup","a2"),("sup","a3"),("sup","a4"),("sup","a5"),("sup","a6"),
+         ("a1","fix"),("a2","fix"),("a3","fix"),("a4","fix"),("a5","fix"),("a6","fix"),
+         ("fix","out")]
+# dashed (optional / grounding / module reuse)
+DASHED = [("az","sup","enrich"),("kb","sup","ground"),
+          ("m1","fix","reuse"),("m2","fix","reuse"),("m3","fix","reuse"),("m4","fix","reuse")]
 
 
-def node_xml(nid, label, x, y, w, h, fill, stroke):
-    label = html.escape(label).replace("\n", "&#10;")
-    if fill == "none":
-        style = "text;html=1;fontSize=20;fontColor=#1A1A1A;fontStyle=1;align=center;"
+def node_xml(nid,label,x,y,w,h,fill,stroke):
+    if fill=="none":
+        style="text;html=1;fontSize=20;fontColor=#1A1A1A;fontStyle=1;align=center;"
     else:
-        style = (f"rounded=1;whiteSpace=wrap;html=1;fillColor={fill};strokeColor={stroke};"
-                 f"fontColor=#1A1A1A;fontSize=13;fontStyle=1;arcSize=14;")
+        style=(f"rounded=1;whiteSpace=wrap;html=1;fillColor={fill};strokeColor={stroke};"
+               f"fontColor=#1A1A1A;fontSize=12;fontStyle=1;arcSize=12;")
     return (f'<mxCell id="{nid}" value="{label}" style="{style}" vertex="1" parent="1">'
             f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>')
 
 
-def edge_xml(eid, s, t, ex, en, dashed):
-    style = ("edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;jettySize=auto;"
-             f"exitX={ex:.3f};exitY=1;exitDx=0;exitDy=0;entryX={en:.3f};entryY=0;"
-             "entryDx=0;entryDy=0;endArrow=block;strokeColor=#8A94A0;strokeWidth=1.5;")
-    return (f'<mxCell id="{eid}" style="{style}" edge="1" parent="1" '
-            f'source="{s}" target="{t}"><mxGeometry relative="1" as="geometry"/></mxCell>')
+def edge_xml(eid,s,t,dashed=False,label=""):
+    base=("edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;"
+          "strokeColor=#8A94A0;strokeWidth=1.5;")
+    if dashed: base+="dashed=1;endArrow=open;strokeColor=#0E8088;"
+    lbl=f' value="{label}"' if label else ""
+    return (f'<mxCell id="{eid}"{lbl} style="{base}" edge="1" parent="1" source="{s}" target="{t}">'
+            f'<mxGeometry relative="1" as="geometry"/></mxCell>')
 
 
-def side_edge_xml(eid, s, t, exx, exy, enx, eny):
-    style = ("edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;"
-             f"exitX={exx};exitY={exy};entryX={enx};entryY={eny};"
-             "endArrow=open;strokeColor=#0E8088;strokeWidth=1.4;")
-    return (f'<mxCell id="{eid}" style="{style}" edge="1" parent="1" '
-            f'source="{s}" target="{t}"><mxGeometry relative="1" as="geometry"/></mxCell>')
+cells=[node_xml(*n) for n in NODES]
+cells+=[edge_xml(f"s{i}",s,t) for i,(s,t) in enumerate(SOLID)]
+cells+=[edge_xml(f"d{i}",s,t,True,lab) for i,(s,t,lab) in enumerate(DASHED)]
 
-
-cells = [node_xml(*n) for n in NODES]
-cells += [edge_xml(f"e{i}", s, t, ex, en, d) for i, (s, t, ex, en, d) in enumerate(EDGES)]
-# dashed side links
-cells.append(side_edge_xml("eaz", "azure", "sup", 1, 0.5, 0, 0.5))
-cells.append(side_edge_xml("erag", "rag", "sup", 0, 0.5, 1, 0.5))
-
-xml = f'''<mxfile host="app.diagrams.net">
+xml=f'''<mxfile host="app.diagrams.net">
   <diagram name="ClosureCopilot" id="closurecopilot">
     <mxGraphModel dx="1500" dy="1000" grid="0" gridSize="10" guides="1" tooltips="1"
         connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500"
-        pageHeight="1000" background="#FFFFFF" math="0" shadow="0">
+        pageHeight="920" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
@@ -107,6 +88,5 @@ xml = f'''<mxfile host="app.diagrams.net">
   </diagram>
 </mxfile>'''
 
-with open("docs/architecture.drawio", "w", encoding="utf-8") as f:
-    f.write(xml)
+open("docs/architecture.drawio","w",encoding="utf-8").write(xml)
 print("saved docs/architecture.drawio")
