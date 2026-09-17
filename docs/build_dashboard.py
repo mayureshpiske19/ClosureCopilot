@@ -164,8 +164,8 @@ pre{background:#0d1730;border:1px solid #1c2c56;border-radius:10px;padding:13px 
 
 <script>
 const DATA = __PAYLOAD__;
-const LAYER_COLORS={"RTL":"#7c3aed","SDC (constraints)":"#2563eb","UPF (power intent)":"#d97706","Synthesis setup":"#64748b"};
-const DOMAIN_ICON={timing:"⏱",power:"⚡",area:"▦",synthesis:"◈",upf:"⏻",sdc:"◇",promotion:"⇗",regression:"↯",physical:"▤"};
+const LAYER_COLORS={"RTL":"#7c3aed","SDC (constraints)":"#2563eb","UPF (power intent)":"#d97706","Synthesis setup":"#64748b","Formal setup":"#0e8088"};
+const DOMAIN_ICON={timing:"⏱",power:"⚡",area:"▦",synthesis:"◈",upf:"⏻",sdc:"◇",formal:"≡",promotion:"⇗",regression:"↯"};
 const esc=s=>(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
 const allItems=DATA.ppa.concat(Object.values(DATA.modules).flat());
@@ -211,7 +211,6 @@ const TABS=[
  {id:'promotion',ic:'⇗',label:'Constraint Promotion',sub:'Reconcile IP / block SDC up to the top level',ct:DATA.modules.promotion.length},
  {id:'upf',ic:'⏻',label:'UPF Signoff',sub:'Isolation · retention · clock-gating realization',ct:DATA.modules.upf.length},
  {id:'regression',ic:'↯',label:'Regression Detective',sub:'Diff two runs · attribute the regression',ct:DATA.modules.regression.length},
- {id:'physical',ic:'▤',label:'Physical-Aware',sub:'Congestion → RTL restructuring hints',ct:DATA.modules.physical.length},
  {id:'ask',ic:'✦',label:'Ask',sub:'Ask the copilot about your findings',ct:''},
 ];
 document.getElementById('nav').innerHTML=TABS.map((t,i)=>
@@ -225,16 +224,15 @@ function bars(groups,colors){const max=Math.max(...Object.values(groups),1);
 function severityCard(){const g={High:0,Medium:0,Low:0};allItems.forEach(x=>g[x.severity]=(g[x.severity]||0)+1);
  return `<div class="chart-card"><div class="sec-h">Findings by severity</div>
   ${bars(g,{High:'#e11d48',Medium:'#e08600',Low:'#16a34a'})}</div>`;}
-function layerChartCard(){const o=['RTL','SDC (constraints)','UPF (power intent)','Synthesis setup'];
+function layerChartCard(){const o=['RTL','SDC (constraints)','UPF (power intent)','Synthesis setup','Formal setup'];
  const g={};o.forEach(k=>g[k.split(' ')[0]]=layerCount[k]||0);
  return `<div class="chart-card"><div class="sec-h">Fixes by layer</div>
-  ${bars(g,{RTL:'#7c3aed','SDC':'#2563eb','UPF':'#d97706','Synthesis':'#64748b'})}</div>`;}
+  ${bars(g,{RTL:'#7c3aed','SDC':'#2563eb','UPF':'#d97706','Synthesis':'#64748b','Formal':'#0e8088'})}</div>`;}
 const modCards=[
- ['◎ PPA Analyzer',DATA.ppa.length,'fix-routing P/P/A','#4f46e5'],
+ ['◎ PPA Analyzer',DATA.ppa.length,'fix-routing P/P/A + Formal','#4f46e5'],
  ['⇗ Constraint Promotion',DATA.modules.promotion.length,'IP→top reconcile','#2563eb'],
  ['⏻ UPF Signoff',DATA.modules.upf.length,'power-intent checks','#d97706'],
  ['↯ Regression Detective',DATA.modules.regression.length,'change attribution','#e11d48'],
- ['▤ Physical-Aware',DATA.modules.physical.length,'congestion→RTL','#0ea5a4'],
 ];
 const overview=`
  <div class="band"><div class="lab">Supervisor summary</div><p>${esc(DATA.summary)}</p></div>
@@ -242,7 +240,7 @@ const overview=`
    <ul>${DATA.correlations.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>`:''}
  <div class="grid2">${severityCard()}${layerChartCard()}</div>
  <div class="sec-h" style="margin-top:20px">Modules</div>
- <div class="kpis" style="grid-template-columns:repeat(5,1fr)">
+ <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
    ${modCards.map(([t,n,s,c])=>`<div class="kpi" style="box-shadow:var(--sh1)">
      <div style="font-weight:800;font-size:13px;color:${c}">${t}</div>
      <div class="n" style="font-size:26px">${n}</div><div class="hint">${s}</div></div>`).join('')}
@@ -263,7 +261,7 @@ function askPanel(){const ex=["Which issues should I fix in constraints vs RTL?"
    <div class="filters">${ex.map(q=>`<div class="chip" data-q="${q.replace(/"/g,'&quot;')}">${q}</div>`).join('')}</div></div>
    <div id="askOut"></div>`;}
 const PANEL_HTML={overview,ppa:ppaPanel(),promotion:modPanel('promotion'),upf:upfPanel(),
-  regression:modPanel('regression')||'<div class="card">No regressions.</div>',physical:modPanel('physical'),ask:askPanel()};
+  regression:modPanel('regression')||'<div class="card">No regressions.</div>',ask:askPanel()};
 document.getElementById('panels').innerHTML=TABS.map((t,i)=>
   `<div class="panel ${i===0?'active':''}" data-p="${t.id}">${PANEL_HTML[t.id]}</div>`).join('');
 

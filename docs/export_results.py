@@ -5,7 +5,7 @@ os.environ["CLOSURECOPILOT_OFFLINE"] = "1"
 
 from closurecopilot import config
 from closurecopilot.orchestrator import Supervisor, run_on_samples
-from closurecopilot.modules import promotion, regression, physical, upf_signoff
+from closurecopilot.modules import promotion, regression, upf_signoff
 
 
 def item_to_dict(it):
@@ -28,7 +28,6 @@ mods = {
     "promotion": promotion.run_on_samples(S),
     "upf": upf_signoff.run_on_samples(S),
     "regression": regression.run_on_samples(S),
-    "physical": physical.run_on_samples(S),
 }
 sup = Supervisor()
 

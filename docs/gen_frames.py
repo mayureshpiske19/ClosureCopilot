@@ -115,13 +115,13 @@ para(d, 70, 800, "Every fix ships with a corrected, copy-paste snippet + a cross
 save(img, 4)
 
 # F5 — five modules
-img = new(); d = ImageDraw.Draw(img); header(d, "Five modules, one dashboard", GREEN)
+img = new(); d = ImageDraw.Draw(img); header(d, "Five capabilities, one dashboard", GREEN)
 mods = [
     ("PPA Analyzer", "Ranks issues and routes each fix to RTL / SDC / UPF with a snippet + trade-off.", BLUE),
     ("Constraint Promotion", "Reconciles IP -> top constraints and generates corrected top-level SDC.", PURPLE),
     ("UPF Signoff", "Checks isolation, retention & clock-gating intent; emits corrected UPF.", ORANGE),
     ("Regression Detective", "Compares two runs; finds what regressed and the change behind it.", RED),
-    ("Physical-Aware Feedback", "Turns place-and-route congestion into concrete RTL restructuring hints.", GREEN),
+    ("Formal Equivalence (LEC)", "Routes LEC non-equivalence to a Formal-setup fix vs a genuine RTL bug.", GREEN),
 ]
 y = 210
 for name, desc, col in mods:

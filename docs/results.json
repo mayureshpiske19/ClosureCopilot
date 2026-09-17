@@ -1,6 +1,6 @@
 {
   "mode": "offline",
-  "summary": "Analyzed 17 findings (8 high severity). Fix routing \u2192 RTL: 10, SDC (constraints): 4, Synthesis setup: 1, UPF (power intent): 2. Cross-domain insights: UPF intends clock gating on dma_ctrl and the power report measures high clock power there \u2192 intent NOT realized; single RTL fix (wire the enable) closes both.",
+  "summary": "Analyzed 19 findings (10 high severity). Fix routing \u2192 Formal setup: 2, RTL: 10, SDC (constraints): 4, Synthesis setup: 1, UPF (power intent): 2. Cross-domain insights: UPF intends clock gating on dma_ctrl and the power report measures high clock power there \u2192 intent NOT realized; single RTL fix (wire the enable) closes both.",
   "correlations": [
     "UPF intends clock gating on dma_ctrl and the power report measures high clock power there \u2192 intent NOT realized; single RTL fix (wire the enable) closes both."
   ],
@@ -116,6 +116,68 @@
           "design:Known design intent notes (authoritative for analysis)",
           "global:Clock power dominated by ungated registers",
           "global:Missing clock-gating opportunities"
+        ]
+      }
+    },
+    {
+      "domain": "formal",
+      "title": "LEC non-equivalence on dma_ctrl/buf_q[3]",
+      "severity": "High",
+      "location": "dma_ctrl",
+      "detail": "clock-gating enable added downstream of compare point",
+      "metrics": {
+        "issue": "cg_eco_mismatch",
+        "key_point": "dma_ctrl/buf_q[3]",
+        "type": "DFF"
+      },
+      "source": "soc_top_lec.rpt",
+      "fix": {
+        "layer": "Formal setup",
+        "rationale": "Non-equivalence is caused by an intended clock-gating ECO, not an RTL bug. Model the ICG in the LEC setup so the compare point matches \u2014 do NOT edit RTL.",
+        "snippet": "# Formality \u2014 model the inserted gating cell\nguide_clock_gate -gated_reg dma_ctrl/buf_q -enable dma_active\n# or: set_dont_verify_points -type cell {dma_ctrl/ICG_buf_q}",
+        "tradeoff": {
+          "timing": "none",
+          "power": "none",
+          "area": "none",
+          "note": "verification-setup fix; RTL intent preserved"
+        },
+        "confidence": 0.85,
+        "references": [
+          "design:Power intent",
+          "design:Overview",
+          "global:Clock-gating ECO mismatch",
+          "global:or model the gating so the compare point matches"
+        ]
+      }
+    },
+    {
+      "domain": "formal",
+      "title": "LEC non-equivalence on crc_gen/crc_q[7]",
+      "severity": "High",
+      "location": "crc_gen",
+      "detail": "retiming moved register across combinational XOR (phase mismatch)",
+      "metrics": {
+        "issue": "retime_mismatch",
+        "key_point": "crc_gen/crc_q[7]",
+        "type": "DFF"
+      },
+      "source": "soc_top_lec.rpt",
+      "fix": {
+        "layer": "Formal setup",
+        "rationale": "Retiming moved a register across combinational logic, so registers no longer map 1:1. Enable sequential analysis and supply the moved-register mapping.",
+        "snippet": "set_analysis_mode -sequential\nadd_mapped_points crc_gen/crc_q_reg  crc_gen/crc_q_retimed",
+        "tradeoff": {
+          "timing": "none",
+          "power": "none",
+          "area": "none",
+          "note": "verification-setup fix; no RTL change"
+        },
+        "confidence": 0.8,
+        "references": [
+          "design:Known design intent notes (authoritative for analysis)",
+          "design:Overview",
+          "global:Retiming / register-movement mismatch",
+          "global:Root-cause routing for setup violations"
         ]
       }
     },
@@ -721,92 +783,6 @@
           "references": []
         }
       }
-    ],
-    "physical": [
-      {
-        "domain": "physical",
-        "title": "Routing congestion hotspot in crc_gen",
-        "severity": "High",
-        "location": "crc_gen",
-        "detail": "Peak congestion 96% (util 88%, overflow 214 gcells). Physically unfriendly RTL structure.",
-        "metrics": {
-          "peak_congestion_pct": 96.0,
-          "overflow": 214,
-          "util_pct": 88.0
-        },
-        "source": "congestion.rpt",
-        "fix": {
-          "layer": "RTL",
-          "rationale": "Wide XOR tree \u2014 pipeline the tree or split into balanced stages so routing demand spreads across a register boundary.",
-          "snippet": "// pipeline the CRC XOR tree\nalways_ff @(posedge clk) crc_stage <= crc_partial;  // split tree",
-          "tradeoff": {
-            "timing": "improves (shorter nets)",
-            "power": "minor",
-            "area": "+minor (regs)",
-            "note": "eases congestion; +1 cycle latency"
-          },
-          "confidence": 0.75,
-          "references": [
-            "global:High utilization / congestion"
-          ]
-        }
-      },
-      {
-        "domain": "physical",
-        "title": "Routing congestion hotspot in alu",
-        "severity": "Medium",
-        "location": "alu",
-        "detail": "Peak congestion 78% (util 81%, overflow 12 gcells). Physically unfriendly RTL structure.",
-        "metrics": {
-          "peak_congestion_pct": 78.0,
-          "overflow": 12,
-          "util_pct": 81.0
-        },
-        "source": "congestion.rpt",
-        "fix": {
-          "layer": "RTL",
-          "rationale": "High local congestion \u2014 restructure or pipeline the dense combinational logic; consider logic sharing.",
-          "snippet": "// restructure / pipeline the dense combinational cone",
-          "tradeoff": {
-            "timing": "improves (shorter nets)",
-            "power": "minor",
-            "area": "+minor (regs)",
-            "note": "eases congestion; +1 cycle latency"
-          },
-          "confidence": 0.75,
-          "references": [
-            "global:High utilization / congestion"
-          ]
-        }
-      },
-      {
-        "domain": "physical",
-        "title": "Routing congestion hotspot in decoder",
-        "severity": "Medium",
-        "location": "decoder",
-        "detail": "Peak congestion 90% (util 77%, overflow 88 gcells). Physically unfriendly RTL structure.",
-        "metrics": {
-          "peak_congestion_pct": 90.0,
-          "overflow": 88,
-          "util_pct": 77.0
-        },
-        "source": "congestion.rpt",
-        "fix": {
-          "layer": "RTL",
-          "rationale": "Large one-hot decode fanout \u2014 register the decode or restructure to reduce net fanout / spread drivers.",
-          "snippet": "// register decode outputs to cut fanout congestion\nalways_ff @(posedge clk) dec_q <= decode_comb;",
-          "tradeoff": {
-            "timing": "improves (shorter nets)",
-            "power": "minor",
-            "area": "+minor (regs)",
-            "note": "eases congestion; +1 cycle latency"
-          },
-          "confidence": 0.75,
-          "references": [
-            "global:High utilization / congestion"
-          ]
-        }
-      }
     ]
   },
   "upf_checklist": [
@@ -827,7 +803,7 @@
     }
   ],
   "kb": {
-    "global_chunks": 16,
+    "global_chunks": 22,
     "design_chunks": 5
   }
 }

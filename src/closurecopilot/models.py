@@ -9,6 +9,7 @@ LAYER_RTL = "RTL"
 LAYER_SDC = "SDC (constraints)"
 LAYER_UPF = "UPF (power intent)"
 LAYER_SYNTH = "Synthesis setup"
+LAYER_FORMAL = "Formal setup"
 
 SEVERITY_ORDER = {"High": 0, "Medium": 1, "Low": 2}
 
@@ -16,7 +17,7 @@ SEVERITY_ORDER = {"High": 0, "Medium": 1, "Low": 2}
 @dataclass
 class Finding:
     """A single issue extracted from a backend report."""
-    domain: str                       # timing | power | area | synthesis | upf | sdc
+    domain: str                       # timing | power | area | synthesis | upf | sdc | formal
     title: str
     severity: str = "Medium"          # High | Medium | Low
     location: str = ""                # instance or file:line

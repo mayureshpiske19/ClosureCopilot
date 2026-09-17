@@ -9,6 +9,22 @@ from .. import fix_router, llm
 class SpecialistAgent:
     domain = "generic"
     name = "Specialist Agent"
+    group = None
+    reads: tuple = ()
+    fix_layers: tuple = ()
+
+    def __init__(self, domain=None, name=None, group=None,
+                 reads=None, fix_layers=None) -> None:
+        if domain is not None:
+            self.domain = domain
+        if name is not None:
+            self.name = name
+        if group is not None:
+            self.group = group
+        if reads is not None:
+            self.reads = tuple(reads)
+        if fix_layers is not None:
+            self.fix_layers = tuple(fix_layers)
 
     def handles(self, f: Finding) -> bool:
         return f.domain == self.domain
@@ -57,7 +73,3 @@ class UPFAgent(SpecialistAgent):
 
 class ConstraintsAgent(SpecialistAgent):
     domain, name = "sdc", "Constraints (SDC) Agent"
-
-
-ALL_AGENTS = [PowerAgent(), TimingAgent(), AreaAgent(),
-              SynthesisAgent(), UPFAgent(), ConstraintsAgent()]

@@ -16,6 +16,7 @@ SRC_DIR = PKG_DIR.parent
 REPO_ROOT = SRC_DIR.parent
 DATA_DIR = REPO_ROOT / "data"
 SAMPLES_DIR = DATA_DIR / "samples"
+AGENTS_CONFIG = REPO_ROOT / "agents.yaml"
 KNOWLEDGE_GLOBAL = DATA_DIR / "knowledge" / "global"
 KNOWLEDGE_DESIGN = DATA_DIR / "knowledge" / "design"
 

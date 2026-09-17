@@ -46,7 +46,7 @@ def test_upf_isolation_routes_to_upf():
 
 # ---- product modules -----------------------------------------------------
 from closurecopilot import config
-from closurecopilot.modules import promotion, regression, physical, upf_signoff
+from closurecopilot.modules import promotion, regression, upf_signoff
 
 
 def test_constraint_promotion_detects_mismatches():
@@ -63,10 +63,12 @@ def test_regression_attributes_to_commit():
     assert any("commit" in it.finding.metrics for it in pipe)
 
 
-def test_physical_flags_congestion_hotspots():
-    items = physical.run_on_samples(config.SAMPLES_DIR)
-    assert any("crc_gen" in it.finding.location for it in items)
-    assert all(it.fix.layer == LAYER_RTL for it in items)
+def test_formal_lec_routes_to_formal_setup():
+    from closurecopilot.models import LAYER_FORMAL
+    r = run_on_samples()
+    lec = [it for it in r.items if it.finding.domain == "formal"]
+    assert lec, "expected LEC non-equivalence findings"
+    assert any(it.fix.layer == LAYER_FORMAL for it in lec)
 
 
 def test_upf_signoff_checklist_has_failures():

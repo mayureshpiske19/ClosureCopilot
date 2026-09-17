@@ -7,7 +7,7 @@ and (optionally) the LLM enrich the rationale in the agents layer.
 """
 from __future__ import annotations
 
-from .models import Finding, Fix, LAYER_RTL, LAYER_SDC, LAYER_UPF, LAYER_SYNTH
+from .models import Finding, Fix, LAYER_RTL, LAYER_SDC, LAYER_UPF, LAYER_SYNTH, LAYER_FORMAL
 
 
 def route(f: Finding) -> Fix:
@@ -172,5 +172,37 @@ def route(f: Finding) -> Fix:
                 snippet="set_false_path -from [get_ports test_mode]",
                 tradeoff={"timing": "cleans report", "power": "none", "area": "none"},
                 confidence=0.8)
+
+    # ---- FORMAL / LEC -----------------------------------------------------
+    if d == "formal":
+        issue = m.get("issue")
+        if issue == "cg_eco_mismatch":
+            return Fix(LAYER_FORMAL,
+                rationale="Non-equivalence is caused by an intended clock-gating ECO, not an "
+                          "RTL bug. Model the ICG in the LEC setup so the compare point "
+                          "matches — do NOT edit RTL.",
+                snippet="# Formality — model the inserted gating cell\n"
+                        "guide_clock_gate -gated_reg dma_ctrl/buf_q -enable dma_active\n"
+                        "# or: set_dont_verify_points -type cell {dma_ctrl/ICG_buf_q}",
+                tradeoff={"timing": "none", "power": "none", "area": "none",
+                          "note": "verification-setup fix; RTL intent preserved"},
+                confidence=0.85)
+        if issue == "retime_mismatch":
+            return Fix(LAYER_FORMAL,
+                rationale="Retiming moved a register across combinational logic, so registers "
+                          "no longer map 1:1. Enable sequential analysis and supply the "
+                          "moved-register mapping.",
+                snippet="set_analysis_mode -sequential\n"
+                        "add_mapped_points crc_gen/crc_q_reg  crc_gen/crc_q_retimed",
+                tradeoff={"timing": "none", "power": "none", "area": "none",
+                          "note": "verification-setup fix; no RTL change"},
+                confidence=0.8)
+        return Fix(LAYER_RTL,
+            rationale="No intended ECO or retiming explains this compare-point failure — treat "
+                      "it as a genuine functional mismatch and fix the RTL, then re-run LEC.",
+            snippet="// inspect the failing cone; correct the RTL functional divergence\n"
+                    "// then re-run LEC to confirm equivalence",
+            tradeoff={"timing": "n/a", "power": "n/a", "area": "n/a"},
+            confidence=0.6)
 
     return Fix(LAYER_RTL, rationale="Manual review recommended.", confidence=0.3)

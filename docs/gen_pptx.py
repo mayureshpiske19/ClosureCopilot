@@ -125,14 +125,14 @@ text(s, Inches(0.7), Inches(5.2), Inches(12), Inches(0.8),
      [("Every fix ships with a corrected, copy-paste snippet + a cross-domain PPA trade-off.",
        18, DARK, True)])
 
-# ---- Slide 5 : five modules ----
-s = slide(); bg(s); header(s, "Five modules, one dashboard", GREEN)
+# ---- Slide 5 : five capabilities ----
+s = slide(); bg(s); header(s, "Five capabilities, one dashboard", GREEN)
 mods = [
     ("PPA Analyzer", "Ranks issues and routes each fix to RTL / SDC / UPF with a snippet + trade-off.", PRIMARY),
     ("Constraint Promotion", "Reconciles IP → top constraints; generates corrected top-level SDC.", PURPLE),
     ("UPF Signoff", "Checks isolation, retention & clock-gating intent; emits corrected UPF.", ORANGE),
     ("Regression Detective", "Compares two runs; finds what regressed and the change behind it.", RED),
-    ("Physical-Aware Feedback", "Turns P&R congestion into concrete RTL restructuring hints.", GREEN),
+    ("Formal Equivalence (LEC)", "Routes LEC non-equivalence to a Formal-setup fix vs a genuine RTL bug.", GREEN),
 ]
 y = 1.5
 for name, desc, col in mods:

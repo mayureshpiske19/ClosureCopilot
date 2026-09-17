@@ -1,0 +1,14 @@
+# Logical Equivalence Check (LEC) Report  --  design: soc_top
+# golden: rtl   revised: netlist (post-synth + ECO)   tool: Formality / Conformal
+Compare Points:        14231
+Passing (equivalent):  14229
+Failing (non-equivalent): 2
+Unread / Abort:        0
+
+Non-equivalent points:
+  key_point: dma_ctrl/buf_q[3]   type: DFF   reason: clock-gating enable added downstream of compare point
+  key_point: crc_gen/crc_q[7]    type: DFF   reason: retiming moved register across combinational XOR (phase mismatch)
+
+# Notes
+# dma_ctrl: ECO clock-gate insertion changed sequential behavior at compare point -> model the ICG in LEC.
+# crc_gen: retimed register -- enable sequential analysis / supply mapping for the moved registers.

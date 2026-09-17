@@ -1,7 +1,7 @@
 """ClosureCopilot — Backend Closure Copilot (product UI).
 
 A unified multi-agent dashboard:
-  Overview · PPA Analyzer · Constraint Promotion · UPF Signoff · Regression · Physical · Ask
+  Overview · PPA Analyzer · Constraint Promotion · UPF Signoff · Regression · Ask
 
 Run:  streamlit run src/closurecopilot/ui/app.py
 """
@@ -19,16 +19,17 @@ import streamlit as st
 from closurecopilot import config, llm
 from closurecopilot.orchestrator import Supervisor
 from closurecopilot.rag import get_kb
-from closurecopilot.modules import promotion, regression, physical, upf_signoff
+from closurecopilot.modules import promotion, regression, upf_signoff
 
 st.set_page_config(page_title="ClosureCopilot", page_icon="🛠️", layout="wide")
 
 SEV_COLOR = {"High": "#e5484d", "Medium": "#f5a623", "Low": "#3fb950"}
 LAYER_BADGE = {"RTL": "#8957e5", "SDC (constraints)": "#1f6feb",
-               "UPF (power intent)": "#bf8700", "Synthesis setup": "#57606a"}
+               "UPF (power intent)": "#bf8700", "Synthesis setup": "#57606a",
+               "Formal setup": "#0e8088"}
 DOMAIN_ICON = {"timing": "⏱️", "power": "🔋", "area": "📐", "synthesis": "🧩",
-               "upf": "⚡", "sdc": "📎", "promotion": "🔗", "regression": "📉",
-               "physical": "🧱"}
+               "upf": "⚡", "sdc": "📎", "formal": "🟰", "promotion": "🔗",
+               "regression": "📉"}
 
 
 @st.cache_resource
@@ -48,7 +49,6 @@ def load_modules():
     return {
         "promotion": promotion.run_on_samples(S),
         "regression": regression.run_on_samples(S),
-        "physical": physical.run_on_samples(S),
         "upf": upf_signoff.run_on_samples(S),
     }
 
@@ -103,7 +103,6 @@ with st.sidebar:
         st.markdown(f"- {a.name}")
     st.markdown("- 🔗 Constraint-Promotion Agent")
     st.markdown("- 📉 Regression-Detective Agent")
-    st.markdown("- 🧱 Physical-Aware Agent")
 
 # ------------------------------------------------------------------ header
 st.markdown("# ClosureCopilot")
@@ -114,7 +113,7 @@ ppa = load_ppa()
 mods = load_modules()
 
 tabs = st.tabs(["📊 Overview", "🎯 PPA Analyzer", "🔗 Constraint Promotion",
-                "⚡ UPF Signoff", "📉 Regression Detective", "🧱 Physical-Aware", "💬 Ask"])
+                "⚡ UPF Signoff", "📉 Regression Detective", "💬 Ask"])
 
 # ---- Overview -----------------------------------------------------------
 with tabs[0]:
@@ -124,16 +123,15 @@ with tabs[0]:
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Total findings", total)
     c2.metric("High severity", highs)
-    c3.metric("Agents", len(get_supervisor().agents) + 3)
+    c3.metric("Agents", len(get_supervisor().agents) + 2)
     c4.metric("Backend inputs", "7 report types")
     st.info(f"**Supervisor summary** — {ppa.summary}")
     st.markdown("#### Modules")
-    grid = st.columns(5)
-    cards = [("🎯 PPA Analyzer", len(ppa.items), "fix-routing across P/P/A"),
+    grid = st.columns(4)
+    cards = [("🎯 PPA Analyzer", len(ppa.items), "fix-routing across P/P/A + Formal"),
              ("🔗 Constraint Promotion", len(mods['promotion']), "IP→top reconcile"),
              ("⚡ UPF Signoff", len(mods['upf']), "power-intent checks"),
-             ("📉 Regression Detective", len(mods['regression']), "commit attribution"),
-             ("🧱 Physical-Aware", len(mods['physical']), "congestion→RTL")]
+             ("📉 Regression Detective", len(mods['regression']), "commit attribution")]
     for col, (title, n, sub) in zip(grid, cards):
         with col:
             with st.container(border=True):
@@ -181,16 +179,8 @@ with tabs[4]:
     for it in sorted(mods["regression"], key=lambda x: x.severity_rank):
         render_item(it)
 
-# ---- Physical-Aware -----------------------------------------------------
-with tabs[5]:
-    st.markdown("### Physical-Aware RTL Feedback")
-    st.caption("Reads P&R congestion and feeds back RTL restructuring hints "
-               "(the physical→RTL gap).")
-    for it in sorted(mods["physical"], key=lambda x: x.severity_rank):
-        render_item(it)
-
 # ---- Ask ----------------------------------------------------------------
-with tabs[6]:
+with tabs[5]:
     st.markdown("### Ask the copilot")
     q = st.chat_input("e.g. Which issues should I fix in constraints vs RTL?")
     if q:

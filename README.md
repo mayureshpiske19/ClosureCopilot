@@ -2,10 +2,11 @@
 
 **An AI-Native, Multi-Agent Assistant for RTL PPA Closure**
 
-> Feed it any backend report — RTLA power, synthesis, STA timing, area, UPF, or SDC —
-> and a crew of AI agents analyzes **Power, Performance, and Area together**, then tells
-> the RTL engineer **exactly where to fix each issue: RTL, constraints (SDC), or UPF** —
-> with corrected, copy-paste-ready snippets. Including IP→top constraint promotion.
+> Feed it any backend report — RTLA power, synthesis, STA timing, area, UPF, SDC, or
+> formal/LEC — and a crew of AI agents analyzes **Power, Performance, and Area together**,
+> then tells the RTL engineer **exactly where to fix each issue: RTL, constraints (SDC),
+> UPF, or the formal setup** — with corrected, copy-paste-ready snippets. Including IP→top
+> constraint promotion.
 
 ---
 
@@ -32,25 +33,39 @@ A unified suite of backend-closure agents surfaced as one dashboard:
 | **Constraint Promotion** | Reconciles IP/block SDC against top; flags clock/budget/exception mismatches; emits corrected top constraints |
 | **UPF Signoff** | Power-intent counterpart to an SDC checker — isolation / retention / clock-gating checks with corrected UPF |
 | **Regression Detective** | Diffs two backend runs and attributes each PPA regression to the commit that caused it ("git-blame for PPA") |
-| **Physical-Aware Feedback** | Reads P&R congestion and returns RTL restructuring hints (physical → RTL gap) |
+
+The **Equivalence Check** group adds a **Formal (LEC) Agent** that routes each non-equivalence
+to a *formal-setup* fix (intended clock-gating/retiming ECO) vs a *genuine RTL bug*.
 
 
 ## Architecture
+
+![ClosureCopilot architecture](docs/architecture.png)
+
 ```
-Designer ──> Supervisor / Orchestrator
-                 ├─ Ingestion / Parser  (tool-agnostic normalizer)
-                 ├─ Power Agent
-                 ├─ Timing Agent
-                 ├─ Area Agent
-                 ├─ Constraints (SDC) Agent
-                 ├─ UPF Agent
-                 ├─ Synthesis Agent
-                 ├─ Constraint-Promotion Agent
-                 ├─ RTL Analyzer Agent   (maps findings -> RTL file/line)
-                 └─ Fix-Routing / Diagnosis Engine
-Knowledge:  Global PPA RAG  +  Design Context Memory (RAG)
-Tools:      MCP layer wrapping backend tools (replay-safe for demo)
+Inputs (wrappers)   Collaterals (UPF·SDC) · PPA Reports (STA·Synth·RTLA) ·
+                    Equivalence (Formal/LEC) · Design Context (RTL·spec·µarch)
+        │                                               │
+        ▼                                               ▼
+Ingestion / Parser Agent  ──►  Supervisor / Orchestrator  ◄── Grounded knowledge (RAG)
+                                        │                 ◄── Azure OpenAI (LLM, optional)
+      grouping layer:   Collaterals Check │ PPA Analysis │ Equivalence Check
+      leaf agents:      Synthesis·UPF·Constraints │ Power·Timing·Area │ Formal
+                                        │
+                                        ▼
+                       Fix-Routing / Diagnosis Engine   (RTL | SDC | UPF | Synth | Formal)
+                                        │
+                                        ▼
+                       Ranked findings — Streamlit · HTML dashboard · CLI
+
+Closure modules (reuse the Fix-Router):  Constraint Promotion · UPF Signoff · Regression Detective
+Roadmap:  Vendor EDA Tools ──► MCP Tool-Control ──► Supervisor  (run tools · fetch reports & docs)
 ```
+
+The specialist agents are declared in **[`agents.yaml`](agents.yaml)** — the Supervisor builds
+them from that registry at runtime, so adding or re-tuning an agent is a config change, not code.
+The `.drawio` source is in [`docs/architecture.drawio`](docs/architecture.drawio) (PNG/SVG exported
+via `docs/gen_diagram.py`).
 
 ## Tech stack
 Python 3.12 · Streamlit UI · ChromaDB (dual RAG) · Azure OpenAI (with a deterministic
@@ -63,8 +78,8 @@ directly in any browser — a self-contained page (data embedded, works offline,
 
 ![ClosureCopilot dashboard](docs/dashboard.png)
 
-It has seven tabs — **Overview · PPA Analyzer · Constraint Promotion · UPF Signoff ·
-Regression Detective · Physical-Aware · Ask** — with KPI cards, a supervisor summary,
+It has six tabs — **Overview · PPA Analyzer · Constraint Promotion · UPF Signoff ·
+Regression Detective · Ask** — with KPI cards, a supervisor summary,
 cross-domain insights, severity/fix-layer charts, and ranked finding cards (each with the
 fix-layer badge, corrected snippet, PPA trade-off, and grounding references). The **Ask**
 tab answers plain-English questions over the findings, fully offline.

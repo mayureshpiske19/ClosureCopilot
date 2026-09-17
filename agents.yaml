@@ -1,0 +1,61 @@
+# ClosureCopilot — declarative agent registry
+# ---------------------------------------------------------------------------
+# The Supervisor loads this file at runtime and builds every specialist agent
+# from it. Adding, removing, or re-tuning an agent is a config change — no code
+# edit required. This maps 1:1 to the architecture diagram's grouping layer
+# (Collaterals Check · PPA Analysis · Equivalence Check).
+version: 1
+
+groups:
+  - id: collaterals
+    label: Collaterals Check
+  - id: ppa
+    label: PPA Analysis
+  - id: equivalence
+    label: Equivalence Check   # Formal / LEC
+
+agents:
+  # ---- Collaterals Check ---------------------------------------------------
+  - domain: synthesis
+    name: Synthesis Agent
+    group: collaterals
+    reads: [synthesis]
+    fix_layers: [Synth, RTL]
+
+  - domain: upf
+    name: UPF (Power Intent) Agent
+    group: collaterals
+    reads: [upf]
+    fix_layers: [UPF, RTL]
+
+  - domain: sdc
+    name: Constraints (SDC) Agent
+    group: collaterals
+    reads: [sdc]
+    fix_layers: [SDC]
+
+  # ---- PPA Analysis --------------------------------------------------------
+  - domain: power
+    name: Power Agent
+    group: ppa
+    reads: [rtla, sta]
+    fix_layers: [UPF, RTL]
+
+  - domain: timing
+    name: Performance / Timing Agent
+    group: ppa
+    reads: [sta]
+    fix_layers: [SDC, RTL]
+
+  - domain: area
+    name: Area Agent
+    group: ppa
+    reads: [synthesis, rtla]
+    fix_layers: [RTL]
+
+  # ---- Equivalence Check ---------------------------------------------------
+  - domain: formal
+    name: Formal (Equivalence) Agent
+    group: equivalence
+    reads: [lec]
+    fix_layers: [Formal, RTL]

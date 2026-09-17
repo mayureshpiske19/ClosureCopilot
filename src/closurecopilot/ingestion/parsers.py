@@ -2,7 +2,7 @@
 
 Detects the backend report type and extracts structured `Finding`s. Deterministic and
 dependency-free so it always runs. Supports: STA timing, synthesis log, RTLA power,
-area, UPF, SDC.
+area, UPF, SDC, formal/LEC.
 """
 from __future__ import annotations
 
@@ -18,6 +18,8 @@ def detect_type(name: str, text: str) -> str:
         return "upf"
     if n.endswith(".sdc") or ("create_clock" in text and "set_input_delay" in text):
         return "sdc"
+    if "compare points" in text.lower() and "non-equivalent" in text.lower():
+        return "formal"
     if "slack" in text.lower() and "startpoint" in text.lower():
         return "sta"
     if "unmapped" in text.lower() or "inferred latch" in text.lower():
@@ -154,6 +156,27 @@ def parse_upf(text: str, source: str) -> list:
     return findings
 
 
+# ---------------------------------------------------------------- formal / LEC
+def parse_formal(text: str, source: str) -> list:
+    findings = []
+    for m in re.finditer(
+            r"key_point:\s*(\S+)\s+type:\s*(\S+)\s+reason:\s*(.+)", text):
+        point, ptype, reason = m.group(1), m.group(2), m.group(3).strip()
+        r = reason.lower()
+        if "clock-gating" in r or "clock gating" in r or "icg" in r:
+            issue = "cg_eco_mismatch"
+        elif "retim" in r:
+            issue = "retime_mismatch"
+        else:
+            issue = "functional_mismatch"
+        loc = point.split("/")[0] if "/" in point else point
+        findings.append(Finding("formal",
+            f"LEC non-equivalence on {point}", "High",
+            location=loc, detail=reason,
+            source=source, metrics={"issue": issue, "key_point": point, "type": ptype}))
+    return findings
+
+
 # ---------------------------------------------------------------- sdc
 def parse_sdc(text: str, source: str) -> list:
     findings = []
@@ -180,6 +203,7 @@ def parse_sdc(text: str, source: str) -> list:
 _PARSERS = {
     "sta": parse_sta, "synth": parse_synth, "power": parse_power,
     "area": parse_area, "upf": parse_upf, "sdc": parse_sdc,
+    "formal": parse_formal,
 }
 
 
