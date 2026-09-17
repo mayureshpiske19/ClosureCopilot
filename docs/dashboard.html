@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ClosureCopilot — Results Dashboard</title>
+<style>
+  :root{
+    --bg:#0b1220; --bg2:#0f1830; --card:#151f38; --card2:#1a2647;
+    --ink:#eef2fb; --mut:#9aa7c4; --line:#25335a;
+    --blue:#4b8cff; --cyan:#3ccdd8; --green:#38cd8c; --amber:#f0b445; --red:#e5566a; --violet:#9678f0;
+    --rtl:#9678f0; --sdc:#4b8cff; --upf:#f0b445; --synth:#7c8aa5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',system-ui,Arial,sans-serif;background:
+     radial-gradient(1200px 600px at 80% -10%, #16224480, transparent),
+     linear-gradient(180deg,var(--bg),var(--bg2));color:var(--ink);min-height:100vh}
+  .wrap{max-width:1280px;margin:0 auto;padding:28px 26px 70px}
+  header.top{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+  .logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--violet));
+     display:flex;align-items:center;justify-content:center;font-size:24px}
+  h1{font-size:30px;margin:0;font-weight:800;letter-spacing:.3px}
+  .sub{color:var(--cyan);font-weight:600;margin:2px 0 0}
+  .foot-note{color:var(--mut);font-size:12px;margin-top:4px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:22px 0}
+  .kpi{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+     border-radius:16px;padding:18px 20px}
+  .kpi .n{font-size:34px;font-weight:800}
+  .kpi .l{color:var(--mut);font-size:13px;margin-top:2px}
+  .summary{background:#12203f;border:1px solid var(--line);border-left:4px solid var(--blue);
+     border-radius:12px;padding:16px 20px;margin:6px 0 10px;line-height:1.55}
+  .corr{background:#122b25;border:1px solid #1d4a3d;border-left:4px solid var(--green);
+     border-radius:12px;padding:14px 20px;margin:10px 0 4px}
+  .corr h3{margin:0 0 6px;font-size:15px;color:var(--green)}
+  .corr li{margin:4px 0;color:#cfe9df}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 8px}
+  .tab{padding:10px 16px;border-radius:10px;background:var(--card);border:1px solid var(--line);
+     color:var(--mut);cursor:pointer;font-weight:600;font-size:14px;transition:.15s}
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:linear-gradient(135deg,var(--blue),var(--violet));color:#fff;border-color:transparent}
+  .panel{display:none;animation:fade .2s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .chip{padding:6px 12px;border-radius:20px;background:var(--card);border:1px solid var(--line);
+     color:var(--mut);cursor:pointer;font-size:13px}
+  .chip.active{background:#1c2a4d;color:var(--ink);border-color:var(--blue)}
+  .card{background:linear-gradient(180deg,var(--card),#131d36);border:1px solid var(--line);
+     border-radius:14px;padding:16px 18px;margin:12px 0}
+  .row{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+  .title{font-weight:700;font-size:16px}
+  .loc{color:var(--mut);font-size:12.5px;margin:4px 0 8px}
+  .detail{color:#d4ddf2;font-size:14px;line-height:1.5}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;color:#0b1220}
+  .sev-High{background:var(--red);color:#fff}.sev-Medium{background:var(--amber)}.sev-Low{background:var(--green)}
+  .layer{display:inline-block;padding:4px 11px;border-radius:8px;font-size:12.5px;font-weight:700;color:#fff}
+  .conf{color:var(--mut);font-size:12px;margin-top:5px;text-align:right}
+  .why{margin:12px 0 6px;font-size:14px}.why b{color:var(--cyan)}
+  pre{background:#0a122b;border:1px solid var(--line);border-radius:10px;
+     padding:12px 14px;overflow:auto;font-family:'Cascadia Code',Consolas,monospace;font-size:13px;
+     color:#d7e3ff;margin:8px 0}
+  .trade{margin:8px 0;font-size:13.5px;color:#cdd8f0}
+  .trade b{color:#fff}
+  .refs{color:var(--mut);font-size:12px;margin-top:8px}
+  .checklist{display:grid;gap:10px;margin:12px 0}
+  .chk{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);
+     border-radius:12px;padding:14px 18px}
+  .chk .st{font-weight:800}.pass{color:var(--green)}.fail{color:var(--red)}
+  .bars{display:flex;gap:8px;align-items:flex-end;height:160px;margin:10px 0 4px}
+  .bar{flex:1;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--blue),#2a5bd0);
+     position:relative;min-height:6px}
+  .bar span{position:absolute;top:-22px;left:0;right:0;text-align:center;font-size:12px;color:var(--mut)}
+  .bar em{position:absolute;bottom:-22px;left:0;right:0;text-align:center;font-size:11px;color:var(--mut);font-style:normal}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .sec-h{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin:6px 0}
+  @media(max-width:820px){.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">🛠️</div>
+    <div>
+      <h1>ClosureCopilot</h1>
+      <div class="sub">Backend Closure Results — it decides WHERE each fix belongs: RTL · SDC · UPF</div>
+      <div class="foot-note" id="modeline"></div>
+    </div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+  <div class="summary" id="summary"></div>
+  <div id="corr"></div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="panels"></div>
+
+  <div class="foot-note" style="margin-top:30px;text-align:right">
+    ClosureCopilot · Mayuresh Piske · © 2026 Microsoft
+  </div>
+</div>
+
+<script>
+const DATA = {"mode": "offline", "summary": "Analyzed 17 findings (8 high severity). Fix routing \u2192 RTL: 10, SDC (constraints): 4, Synthesis setup: 1, UPF (power intent): 2. Cross-domain insights: UPF intends clock gating on dma_ctrl and the power report measures high clock power there \u2192 intent NOT realized; single RTL fix (wire the enable) closes both.", "correlations": ["UPF intends clock gating on dma_ctrl and the power report measures high clock power there \u2192 intent NOT realized; single RTL fix (wire the enable) closes both."], "ppa": [{"domain": "power", "title": "High clock power in dma_ctrl", "severity": "High", "location": "dma_ctrl", "detail": "Clock power 4.90 mW = 56% of block total (8.70 mW). Likely ungated registers.", "metrics": {"clock_mW": 4.9, "total_mW": 8.7, "clock_frac": 0.56}, "source": "power.rpt", "fix": {"layer": "RTL", "rationale": "Clock power dominates because registers are not gated. UPF intends clock gating but the enable is not expressed in RTL, so no ICG is inferred. Guard the register with the activity enable.", "snippet": "// dma_ctrl.sv \u2014 guard update so an ICG is inferred\nalways_ff @(posedge clk)\n  if (dma_active)\n    buf_q <= wdata;", "tradeoff": {"timing": "none", "power": "large clock-power reduction", "area": "negligible (+ICG)"}, "confidence": 0.9, "references": ["design:Power intent", "design:Clocking", "global:Clock power dominated by ungated registers", "global:Root-cause routing for setup violations"]}}, {"domain": "sdc", "title": "IP\u2192top clock mismatch (clk_usb vs clk_120m)", "severity": "High", "location": "usb_ip", "detail": "Block clk_usb (10.0ns) not reconciled with top clk_120m (8.33ns).", "metrics": {"issue": "clock_promotion"}, "source": "soc_top.sdc", "fix": {"layer": "SDC (constraints)", "rationale": "Promote usb_ip block clock to the true top clock and re-budget.", "snippet": "create_clock -name clk_120m -period 8.33 [get_ports clk_120m]\n# map usb_ip onto clk_120m; drop stale clk_usb 10.0ns definition", "tradeoff": {"timing": "re-budgeted", "power": "none", "area": "none"}, "confidence": 0.8, "references": ["design:Clocking", "design:Overview", "global:Constraint promotion (IP \u2192 subsystem \u2192 top)", "global:Root-cause routing for setup violations"]}}, {"domain": "upf", "title": "Missing isolation strategy on PD_DMA outputs", "severity": "High", "location": "PD_DMA", "detail": "Switchable-domain outputs cross to always-on domain without isolation.", "metrics": {"issue": "missing_isolation"}, "source": "soc_top.upf", "fix": {"layer": "UPF (power intent)", "rationale": "Switchable-domain outputs cross to always-on logic without isolation \u2014 they float when powered down. Add isolation.", "snippet": "set_isolation iso_dma -domain PD_DMA -isolation_power_net VDD_AO -clamp_value 0 -applies_to outputs\nset_isolation_control iso_dma -domain PD_DMA -isolation_signal iso_en -isolation_sense high", "tradeoff": {"timing": "none", "power": "enables safe power gating", "area": "minor (iso cells)"}, "confidence": 0.9, "references": ["design:Power intent", "design:Known design intent notes (authoritative for analysis)", "global:UPF isolation", "global:Static vs dynamic vs leakage"]}}, {"domain": "upf", "title": "Clock-gating intent not realized on dma_ctrl", "severity": "High", "location": "dma_ctrl.sv:142", "detail": "UPF intends clock gating; RTL enable not wired (cross-check power report).", "metrics": {"issue": "cg_intent_unrealized"}, "source": "soc_top.upf", "fix": {"layer": "RTL", "rationale": "UPF clock-gating intent is correct but unrealized \u2014 the fix is in RTL: wire the enable so an ICG is inferred (see dma_ctrl.sv:142).", "snippet": "always_ff @(posedge clk) if (dma_active) buf_q <= wdata;", "tradeoff": {"timing": "none", "power": "large clock-power reduction", "area": "negligible"}, "confidence": 0.9, "references": ["design:Power intent", "design:Known design intent notes (authoritative for analysis)", "global:Clock power dominated by ungated registers", "global:Missing clock-gating opportunities"]}}, {"domain": "timing", "title": "Setup violation on clk_usb (usb_tx_reg[0] \u2192 usb_phy_reg[0])", "severity": "High", "location": "usb_tx_reg[0]", "detail": "clock clk_usb defined at 10.0ns in usb_ip.sdc but top maps port to clk_120m (8.33ns)", "metrics": {"slack_ns": -1.9}, "source": "sta_timing.rpt", "fix": {"layer": "SDC (constraints)", "rationale": "Block-level clock period does not match the real top clock. Promote the IP clock and re-budget I/O delays at top.", "snippet": "# reconcile usb_ip clock at top\ncreate_clock -name clk_120m -period 8.33 [get_ports clk_120m]\nset_case_analysis / remap: drive usb_ip on clk_120m, not clk_usb\nset_input_delay  1.6 -clock clk_120m [get_ports usb_*]\nset_output_delay 1.6 -clock clk_120m [get_ports usb_*]", "tradeoff": {"timing": "re-budgeted", "power": "none", "area": "none"}, "confidence": 0.8, "references": ["design:Clocking", "design:Known design intent notes (authoritative for analysis)", "global:Constraint promotion (IP \u2192 subsystem \u2192 top)", "global:Root-cause routing for setup violations"]}}, {"domain": "synthesis", "title": "Unmapped cells in crc_gen", "severity": "High", "location": "crc_gen", "detail": "target library missing XOR4", "metrics": {"issue": "unmapped_cells"}, "source": "synth.log", "fix": {"layer": "Synthesis setup", "rationale": "Operator has no matching library cell. Point synthesis at a lib that contains it, or decompose the operator in RTL.", "snippet": "# synthesis setup\nset_db library {tech_lib_with_XOR4.lib}\n# or RTL: build a balanced XOR tree from XOR2 primitives", "tradeoff": {"timing": "improves", "power": "minor", "area": "improves"}, "confidence": 0.8, "references": ["design:Known design intent notes (authoritative for analysis)", "design:Overview", "global:Unmapped cells", "global:Missing clock-gating opportunities"]}}, {"domain": "synthesis", "title": "Inferred latch 'state_next' in fsm_ctrl", "severity": "High", "location": "fsm_ctrl.sv:88", "detail": "Incomplete case/if \u2014 latch inferred.", "metrics": {"issue": "inferred_latch"}, "source": "synth.log", "fix": {"layer": "RTL", "rationale": "Incomplete case/if inferred a latch. Add a default assignment so the signal is always driven.", "snippet": "always_comb begin\n  state_next = state;   // default\n  unique case (state)\n    ...\n    default: state_next = IDLE;\n  endcase\nend", "tradeoff": {"timing": "improves", "power": "improves", "area": "none"}, "confidence": 0.9, "references": ["global:Inferred latches", "global:Clock power dominated by ungated registers"]}}, {"domain": "synthesis", "title": "Inferred latch 'decode_out' in decoder", "severity": "High", "location": "decoder.sv:44", "detail": "Incomplete case/if \u2014 latch inferred.", "metrics": {"issue": "inferred_latch"}, "source": "synth.log", "fix": {"layer": "RTL", "rationale": "Incomplete case/if inferred a latch. Add a default assignment so the signal is always driven.", "snippet": "always_comb begin\n  state_next = state;   // default\n  unique case (state)\n    ...\n    default: state_next = IDLE;\n  endcase\nend", "tradeoff": {"timing": "improves", "power": "improves", "area": "none"}, "confidence": 0.9, "references": ["global:Inferred latches", "global:Clock power dominated by ungated registers"]}}, {"domain": "area", "title": "High utilization / congestion risk in crc_gen", "severity": "Medium", "location": "crc_gen", "detail": "Utilization 88% (area 33100 um\u00b2) \u2014 congestion risk.", "metrics": {"util_pct": 88.0, "area_um2": 33100.0}, "source": "area.rpt", "fix": {"layer": "RTL", "rationale": "Block over ~85% utilization risks routing congestion. Large combinational trees (e.g. XOR/adder) should be pipelined or restructured / shared in RTL.", "snippet": "// pipeline / restructure the wide combinational tree\n// split the XOR tree across a register stage to ease congestion", "tradeoff": {"timing": "improves", "power": "minor", "area": "+minor (regs)", "note": "eases congestion; adds 1 cycle latency"}, "confidence": 0.75, "references": ["design:Known design intent notes (authoritative for analysis)", "design:Overview", "global:High utilization / congestion", "global:Unmapped cells"]}}, {"domain": "power", "title": "High switching power in alu", "severity": "Medium", "location": "alu", "detail": "Switching power 5.30 mW \u2014 dynamic hotspot.", "metrics": {"switching_mW": 5.3, "total_mW": 10.2}, "source": "power.rpt", "fix": {"layer": "RTL", "rationale": "Dynamic switching hotspot \u2014 apply operand isolation / enable-based gating so idle cycles stop toggling.", "snippet": "// isolate operands when unit is idle\nassign a_gated = enable ? a : a_hold;", "tradeoff": {"timing": "none", "power": "switching reduction", "area": "minor"}, "confidence": 0.7, "references": ["design:Overview", "design:Clocking", "global:Clock power dominated by ungated registers", "global:Static vs dynamic vs leakage"]}}, {"domain": "power", "title": "High switching power in pipe_stage3", "severity": "Medium", "location": "pipe_stage3", "detail": "Switching power 4.10 mW \u2014 dynamic hotspot.", "metrics": {"switching_mW": 4.1, "total_mW": 8.2}, "source": "power.rpt", "fix": {"layer": "RTL", "rationale": "Dynamic switching hotspot \u2014 apply operand isolation / enable-based gating so idle cycles stop toggling.", "snippet": "// isolate operands when unit is idle\nassign a_gated = enable ? a : a_hold;", "tradeoff": {"timing": "none", "power": "switching reduction", "area": "minor"}, "confidence": 0.7, "references": ["design:Overview", "design:Clocking", "global:Clock power dominated by ungated registers", "global:Static vs dynamic vs leakage"]}}, {"domain": "upf", "title": "Missing retention strategy on PD_USB", "severity": "Medium", "location": "PD_USB", "detail": "State registers have no retention across power-down.", "metrics": {"issue": "missing_retention"}, "source": "soc_top.upf", "fix": {"layer": "UPF (power intent)", "rationale": "State registers need to survive power-down \u2014 add a retention strategy to PD_USB.", "snippet": "set_retention ret_usb -domain PD_USB -retention_power_net VDD_AO\nset_retention_control ret_usb -domain PD_USB -save_signal save -restore_signal restore", "tradeoff": {"timing": "none", "power": "enables retention", "area": "minor"}, "confidence": 0.8, "references": ["design:Power intent", "design:Clocking", "global:UPF retention", "global:Clock power dominated by ungated registers"]}}, {"domain": "timing", "title": "Setup violation on clk_cfg (cfg_reg_q_reg[3] \u2192 status_reg_q_reg[3])", "severity": "Medium", "location": "cfg_reg_q_reg[3]", "detail": "source register updated once per configuration write (block cfg_ctrl)", "metrics": {"slack_ns": -0.4}, "source": "sta_timing.rpt", "fix": {"layer": "SDC (constraints)", "rationale": "Quasi-static configuration path treated as single-cycle. This is a constraint gap, not a logic bug \u2014 add a multicycle path.", "snippet": "set_multicycle_path -setup 2 -from [get_pins cfg_reg*/CK] -to [get_pins status_reg*/D]\nset_multicycle_path -hold  1 -from [get_pins cfg_reg*/CK] -to [get_pins status_reg*/D]", "tradeoff": {"timing": "resolved", "power": "none", "area": "none"}, "confidence": 0.9, "references": ["design:Clocking", "design:Known design intent notes (authoritative for analysis)", "global:Root-cause routing for setup violations", "global:Clock power dominated by ungated registers"]}}, {"domain": "timing", "title": "Setup violation on clk_core (alu_opa_reg[15] \u2192 alu_res_reg[15])", "severity": "Medium", "location": "alu.sv:210", "detail": "alu.sv:210  (deep combinational cone, no pipeline register)", "metrics": {"slack_ns": -0.18, "logic_depth": 27}, "source": "sta_timing.rpt", "fix": {"layer": "RTL", "rationale": "Genuine deep combinational cone (logic depth 27). Constraints are correct \u2014 pipeline the datapath in RTL.", "snippet": "// insert a pipeline register to split the cone\nalways_ff @(posedge clk_core) res_stage <= res_comb;\n// then register the final result one cycle later", "tradeoff": {"timing": "resolved", "power": "+~1%", "area": "+~2%", "note": "adds 1 cycle latency \u2014 confirm architecturally"}, "confidence": 0.85, "references": ["design:Clocking", "design:Known design intent notes (authoritative for analysis)", "global:Pipeline (RTL) pattern", "global:High utilization / congestion"]}}, {"domain": "synthesis", "title": "Clock gating not inferred in dma_ctrl", "severity": "Medium", "location": "dma_ctrl.sv:142", "detail": "Gating enable not wired in RTL.", "metrics": {"issue": "cg_missing"}, "source": "synth.log", "fix": {"layer": "RTL", "rationale": "Clock-gating enable not visible to the tool. Express the enable as a register guard so ICGs are inferred.", "snippet": "always_ff @(posedge clk) if (enable) q <= d;", "tradeoff": {"timing": "none", "power": "clock-power reduction", "area": "minor"}, "confidence": 0.8, "references": ["design:Power intent", "design:Overview", "global:Clock power dominated by ungated registers", "global:Missing clock-gating opportunities"]}}, {"domain": "synthesis", "title": "Missed clock-gating opportunities", "severity": "Medium", "location": "soc_top", "detail": "12 inserted of 15 detected.", "metrics": {"issue": "cg_opportunity", "inserted": 12, "detected": 15}, "source": "synth.log", "fix": {"layer": "RTL", "rationale": "Clock-gating enable not visible to the tool. Express the enable as a register guard so ICGs are inferred.", "snippet": "always_ff @(posedge clk) if (enable) q <= d;", "tradeoff": {"timing": "none", "power": "clock-power reduction", "area": "minor"}, "confidence": 0.8, "references": ["design:Power intent", "global:Missing clock-gating opportunities", "global:Clock power dominated by ungated registers"]}}, {"domain": "sdc", "title": "Missing false_path on static test_mode", "severity": "Low", "location": "test_mode", "detail": "Static strap signal lacks a false_path exception.", "metrics": {"issue": "missing_false_path"}, "source": "soc_top.sdc", "fix": {"layer": "SDC (constraints)", "rationale": "Static strap signal \u2014 exclude with a false path.", "snippet": "set_false_path -from [get_ports test_mode]", "tradeoff": {"timing": "cleans report", "power": "none", "area": "none"}, "confidence": 0.8, "references": ["design:Known design intent notes (authoritative for analysis)", "design:Clocking", "global:Root-cause routing for setup violations", "global:Clock power dominated by ungated registers"]}}], "modules": {"promotion": [{"domain": "promotion", "title": "Block clock 'clk_usb' not defined at top (usb_ip)", "severity": "High", "location": "usb_ip", "detail": "'usb_ip' assumes clk_usb (10.00ns); top has no matching clock \u2014 the IP is driven by a different top clock. Map and re-budget.", "metrics": {"block_ns": 10.0}, "source": "usb_ip.sdc", "fix": {"layer": "SDC (constraints)", "rationale": "Map the IP's clock onto the real top clock net and drop the stale block clock definition; re-budget I/O delays.", "snippet": "# usb_ip: replace stale 'clk_usb' with the real top clock\n# e.g. usb_ip driven by clk_120m (8.33ns):\nset_input_delay  <budget> -clock <top_clk> [get_ports usb_ip_*]\nset_output_delay <budget> -clock <top_clk> [get_ports usb_ip_*]", "tradeoff": {"timing": "re-budgeted", "power": "none", "area": "none"}, "confidence": 0.8, "references": ["global:Constraint promotion (IP \u2192 subsystem \u2192 top)"]}}, {"domain": "promotion", "title": "Block false_path not promoted to top (usb_ip)", "severity": "Medium", "location": "usb_ip", "detail": "Exception defined in usb_ip block SDC is missing at top: `set_false_path -from [get_ports usb_test_mode]`", "metrics": {"exception": "set_false_path -from [get_ports usb_test_mode]"}, "source": "usb_ip.sdc", "fix": {"layer": "SDC (constraints)", "rationale": "Valid block-level timing exception is lost at integration \u2014 promote it to the top SDC (re-scoped to top instance path).", "snippet": "# promote from usb_ip block SDC to top\nset_false_path -from [get_ports usb_test_mode]", "tradeoff": {"timing": "cleans/re-enables exception", "power": "none", "area": "none"}, "confidence": 0.8, "references": ["global:Constraint promotion (IP \u2192 subsystem \u2192 top)"]}}, {"domain": "promotion", "title": "Block multicycle path not promoted to top (usb_ip)", "severity": "Medium", "location": "usb_ip", "detail": "Exception defined in usb_ip block SDC is missing at top: `set_multicycle_path -setup 2 -from [get_pins cfg_usb_reg*/CK] -to [get_pins usb_status_reg*/D]`", "metrics": {"exception": "set_multicycle_path -setup 2 -from [get_pins cfg_usb_reg*/CK] -to [get_pins usb_status_reg*/D]"}, "source": "usb_ip.sdc", "fix": {"layer": "SDC (constraints)", "rationale": "Valid block-level timing exception is lost at integration \u2014 promote it to the top SDC (re-scoped to top instance path).", "snippet": "# promote from usb_ip block SDC to top\nset_multicycle_path -setup 2 -from [get_pins cfg_usb_reg*/CK] -to [get_pins usb_status_reg*/D]", "tradeoff": {"timing": "cleans/re-enables exception", "power": "none", "area": "none"}, "confidence": 0.8, "references": ["global:Constraint promotion (IP \u2192 subsystem \u2192 top)"]}}, {"domain": "promotion", "title": "Clock period mismatch on clk_dma (dma_ip)", "severity": "High", "location": "dma_ip", "detail": "Block 'dma_ip' constrains clk_dma at 2.00ns but top defines 2.50ns.", "metrics": {"block_ns": 2.0, "top_ns": 2.5}, "source": "dma_ip.sdc", "fix": {"layer": "SDC (constraints)", "rationale": "Reconcile the block budget with the true top clock and re-derive I/O delays against it.", "snippet": "# promote clk_dma for dma_ip to the top budget\ncreate_clock -name clk_dma -period 2.50 [get_ports clk_dma]\n# re-budget block I/O delays to the 2.50ns clock", "tradeoff": {"timing": "re-budgeted", "power": "none", "area": "none"}, "confidence": 0.85, "references": ["global:Constraint promotion (IP \u2192 subsystem \u2192 top)"]}}], "upf": [{"domain": "upf", "title": "Missing isolation strategy on PD_DMA outputs", "severity": "High", "location": "PD_DMA", "detail": "Switchable-domain outputs cross to always-on domain without isolation.", "metrics": {"issue": "missing_isolation"}, "source": "soc_top.upf", "fix": {"layer": "UPF (power intent)", "rationale": "Switchable-domain outputs cross to always-on logic without isolation \u2014 they float when powered down. Add isolation.", "snippet": "set_isolation iso_dma -domain PD_DMA -isolation_power_net VDD_AO -clamp_value 0 -applies_to outputs\nset_isolation_control iso_dma -domain PD_DMA -isolation_signal iso_en -isolation_sense high", "tradeoff": {"timing": "none", "power": "enables safe power gating", "area": "minor (iso cells)"}, "confidence": 0.9, "references": ["global:UPF isolation", "design:Power intent"]}}, {"domain": "upf", "title": "Missing retention strategy on PD_USB", "severity": "Medium", "location": "PD_USB", "detail": "State registers have no retention across power-down.", "metrics": {"issue": "missing_retention"}, "source": "soc_top.upf", "fix": {"layer": "UPF (power intent)", "rationale": "State registers need to survive power-down \u2014 add a retention strategy to PD_USB.", "snippet": "set_retention ret_usb -domain PD_USB -retention_power_net VDD_AO\nset_retention_control ret_usb -domain PD_USB -save_signal save -restore_signal restore", "tradeoff": {"timing": "none", "power": "enables retention", "area": "minor"}, "confidence": 0.8, "references": ["global:UPF isolation", "design:Power intent"]}}, {"domain": "upf", "title": "Clock-gating intent not realized on dma_ctrl", "severity": "High", "location": "dma_ctrl.sv:142", "detail": "UPF intends clock gating; RTL enable not wired (cross-check power report). Power report confirms clock power = 56% of dma_ctrl total.", "metrics": {"issue": "cg_intent_unrealized", "measured_clock_frac": 0.56}, "source": "soc_top.upf", "fix": {"layer": "RTL", "rationale": "UPF clock-gating intent is correct but unrealized \u2014 the fix is in RTL: wire the enable so an ICG is inferred (see dma_ctrl.sv:142).", "snippet": "always_ff @(posedge clk) if (dma_active) buf_q <= wdata;", "tradeoff": {"timing": "none", "power": "large clock-power reduction", "area": "negligible"}, "confidence": 0.9, "references": ["global:UPF isolation", "design:Power intent"]}}], "regression": [{"domain": "regression", "title": "Power regression in pipe_stage3: +1.50 mW", "severity": "High", "location": "pipe_stage3", "detail": "Total power 6.70 \u2192 8.20 mW (+1.50). Largest mover: switching (3.20 \u2192 4.10 mW). Attributed to commit a3f9d0 by mayuresh: \"pipe_stage3: widen datapath, drop pipeline reg\".", "metrics": {"delta_mW": 1.5, "component": "switching", "commit": "a3f9d0"}, "source": "power_new.rpt", "fix": {"layer": "RTL", "rationale": "The switching power rose after the attributed change \u2014 review that commit's RTL edit to pipe_stage3 (e.g. dropped pipeline stage / wider datapath increases toggling).", "snippet": "# git show a3f9d0 -- pipe_stage3   # inspect the regressing change", "tradeoff": {"power": "recover ~1.5 mW", "timing": "check", "area": "check"}, "confidence": 0.8, "references": []}}, {"domain": "regression", "title": "Timing regression on clk_core: WNS -0.020 \u2192 -0.180 ns", "severity": "High", "location": "clk_core", "detail": "WNS worsened by -0.160 ns; failing endpoints 1 \u2192 2. Cross-check same-commit RTL edits.", "metrics": {"delta_wns_ns": -0.16}, "source": "sta_new.rpt", "fix": {"layer": "RTL", "rationale": "WNS degraded between runs on this clock \u2014 bisect to the commit that touched the worst path's block; if the path is quasi-static, the fix may be an SDC exception instead.", "snippet": "# git bisect between baseline and new run for this clock's worst path", "tradeoff": {"timing": "recover 0.160 ns", "power": "check", "area": "check"}, "confidence": 0.7, "references": []}}], "physical": [{"domain": "physical", "title": "Routing congestion hotspot in crc_gen", "severity": "High", "location": "crc_gen", "detail": "Peak congestion 96% (util 88%, overflow 214 gcells). Physically unfriendly RTL structure.", "metrics": {"peak_congestion_pct": 96.0, "overflow": 214, "util_pct": 88.0}, "source": "congestion.rpt", "fix": {"layer": "RTL", "rationale": "Wide XOR tree \u2014 pipeline the tree or split into balanced stages so routing demand spreads across a register boundary.", "snippet": "// pipeline the CRC XOR tree\nalways_ff @(posedge clk) crc_stage <= crc_partial;  // split tree", "tradeoff": {"timing": "improves (shorter nets)", "power": "minor", "area": "+minor (regs)", "note": "eases congestion; +1 cycle latency"}, "confidence": 0.75, "references": ["global:High utilization / congestion"]}}, {"domain": "physical", "title": "Routing congestion hotspot in alu", "severity": "Medium", "location": "alu", "detail": "Peak congestion 78% (util 81%, overflow 12 gcells). Physically unfriendly RTL structure.", "metrics": {"peak_congestion_pct": 78.0, "overflow": 12, "util_pct": 81.0}, "source": "congestion.rpt", "fix": {"layer": "RTL", "rationale": "High local congestion \u2014 restructure or pipeline the dense combinational logic; consider logic sharing.", "snippet": "// restructure / pipeline the dense combinational cone", "tradeoff": {"timing": "improves (shorter nets)", "power": "minor", "area": "+minor (regs)", "note": "eases congestion; +1 cycle latency"}, "confidence": 0.75, "references": ["global:High utilization / congestion"]}}, {"domain": "physical", "title": "Routing congestion hotspot in decoder", "severity": "Medium", "location": "decoder", "detail": "Peak congestion 90% (util 77%, overflow 88 gcells). Physically unfriendly RTL structure.", "metrics": {"peak_congestion_pct": 90.0, "overflow": 88, "util_pct": 77.0}, "source": "congestion.rpt", "fix": {"layer": "RTL", "rationale": "Large one-hot decode fanout \u2014 register the decode or restructure to reduce net fanout / spread drivers.", "snippet": "// register decode outputs to cut fanout congestion\nalways_ff @(posedge clk) dec_q <= decode_comb;", "tradeoff": {"timing": "improves (shorter nets)", "power": "minor", "area": "+minor (regs)", "note": "eases congestion; +1 cycle latency"}, "confidence": 0.75, "references": ["global:High utilization / congestion"]}}]}, "upf_checklist": [{"label": "Isolation on switchable-domain outputs", "status": "\u274c FAIL", "note": "Switchable-domain outputs cross to always-on domain without isolation."}, {"label": "Retention on power-gated state", "status": "\u274c FAIL", "note": "State registers have no retention across power-down."}, {"label": "Clock-gating intent realized in RTL", "status": "\u274c FAIL", "note": "UPF intends clock gating; RTL enable not wired (cross-check power report). Power report confirms clock power = 56% of dma_ctrl total."}], "kb": {"global_chunks": 16, "design_chunks": 5}};
+
+const LAYER_COLORS = {"RTL":"#9678f0","SDC (constraints)":"#4b8cff","UPF (power intent)":"#f0b445","Synthesis setup":"#7c8aa5"};
+const DOMAIN_ICON = {timing:"⏱️",power:"🔋",area:"📐",synthesis:"🧩",upf:"⚡",sdc:"📎",promotion:"🔗",regression:"📉",physical:"🧱"};
+const esc = s => (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+function lang(layer){return layer && layer.startsWith("RTL")?"verilog":(layer&&(layer.startsWith("SDC")||layer.startsWith("UPF")))?"tcl":"bash";}
+
+function itemCard(it){
+  const f=it, fx=it.fix||{};
+  const icon=DOMAIN_ICON[f.domain]||"•";
+  const lc=LAYER_COLORS[fx.layer]||"#555";
+  let td="";
+  if(fx.tradeoff){td=Object.entries(fx.tradeoff).map(([k,v])=>`<b>${esc(k)}</b>: ${esc(String(v))}`).join(" &nbsp;·&nbsp; ");}
+  return `<div class="card" data-domain="${f.domain}" data-layer="${fx.layer||''}">
+    <div class="row">
+      <div style="flex:1">
+        <div class="title">${icon} ${esc(f.title)} <span class="pill sev-${f.severity}">${f.severity}</span></div>
+        <div class="loc">📍 ${esc(f.location||'—')} &nbsp;·&nbsp; source: ${esc(f.source||'')}</div>
+        <div class="detail">${esc(f.detail)}</div>
+      </div>
+      <div style="text-align:right;min-width:150px">
+        ${fx.layer?`<span class="layer" style="background:${lc}">Fix in ${esc(fx.layer)}</span>
+        <div class="conf">confidence ${Math.round((fx.confidence||0)*100)}%</div>`:''}
+      </div>
+    </div>
+    ${fx.rationale?`<div class="why"><b>Why / how:</b> ${esc(fx.rationale)}</div>`:''}
+    ${fx.snippet?`<pre>${esc(fx.snippet)}</pre>`:''}
+    ${td?`<div class="trade">🔀 PPA trade-off — ${td}</div>`:''}
+    ${(fx.references&&fx.references.length)?`<div class="refs">📚 grounded in: ${esc(fx.references.join(", "))}</div>`:''}
+  </div>`;
+}
+
+// KPIs
+const modTot = Object.values(DATA.modules).reduce((a,v)=>a+v.length,0);
+const total = DATA.ppa.length + modTot;
+const highs = DATA.ppa.filter(x=>x.severity==='High').length
+  + Object.values(DATA.modules).flat().filter(x=>x.severity==='High').length;
+const allItems = DATA.ppa.concat(Object.values(DATA.modules).flat());
+const layerCount = {};
+allItems.forEach(x=>{if(x.fix){layerCount[x.fix.layer]=(layerCount[x.fix.layer]||0)+1;}});
+const rtl = layerCount['RTL']||0;
+const cons = (layerCount['SDC (constraints)']||0)+(layerCount['UPF (power intent)']||0);
+
+document.getElementById('modeline').textContent =
+  `Engine: ${DATA.mode==='offline'?'🟡 Offline (deterministic)':'🟢 Azure OpenAI'} · RAG: ${DATA.kb.global_chunks} global + ${DATA.kb.design_chunks} design-context chunks`;
+
+document.getElementById('kpis').innerHTML = [
+  ['Total findings',total],['High severity',highs],['RTL fixes',rtl],['Constraint / UPF fixes',cons]
+].map(([l,n])=>`<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+
+document.getElementById('summary').innerHTML = `<b style="color:#fff">Supervisor summary</b><br>${esc(DATA.summary)}`;
+
+if(DATA.correlations && DATA.correlations.length){
+  document.getElementById('corr').innerHTML =
+   `<div class="corr"><h3>🔗 Cross-domain insights</h3><ul>${DATA.correlations.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>`;
+}
+
+// Tabs
+const TABS = [
+  {id:'overview', label:'📊 Overview'},
+  {id:'ppa', label:'🎯 PPA Analyzer'},
+  {id:'promotion', label:'🔗 Constraint Promotion'},
+  {id:'upf', label:'⚡ UPF Signoff'},
+  {id:'regression', label:'📉 Regression Detective'},
+  {id:'physical', label:'🧱 Physical-Aware'},
+];
+const tabsEl=document.getElementById('tabs'), panelsEl=document.getElementById('panels');
+tabsEl.innerHTML = TABS.map((t,i)=>`<div class="tab ${i===0?'active':''}" data-t="${t.id}">${t.label}</div>`).join('');
+
+// Panels
+function severityBars(){
+  const groups={High:0,Medium:0,Low:0}; allItems.forEach(x=>groups[x.severity]=(groups[x.severity]||0)+1);
+  const max=Math.max(...Object.values(groups),1);
+  const colors={High:'var(--red)',Medium:'var(--amber)',Low:'var(--green)'};
+  return `<div class="bars">${Object.entries(groups).map(([k,v])=>
+    `<div class="bar" style="height:${Math.max(v/max*140,6)}px;background:${colors[k]}"><span>${v}</span><em>${k}</em></div>`).join('')}</div>`;
+}
+function layerBars(){
+  const order=['RTL','SDC (constraints)','UPF (power intent)','Synthesis setup'];
+  const max=Math.max(...order.map(o=>layerCount[o]||0),1);
+  return `<div class="bars">${order.map(o=>
+    `<div class="bar" style="height:${Math.max((layerCount[o]||0)/max*140,6)}px;background:${LAYER_COLORS[o]}">
+      <span>${layerCount[o]||0}</span><em>${o.split(' ')[0]}</em></div>`).join('')}</div>`;
+}
+const modCards = [
+  ['🎯 PPA Analyzer', DATA.ppa.length, 'fix-routing across P/P/A'],
+  ['🔗 Constraint Promotion', DATA.modules.promotion.length, 'IP→top reconcile'],
+  ['⚡ UPF Signoff', DATA.modules.upf.length, 'power-intent checks'],
+  ['📉 Regression Detective', DATA.modules.regression.length, 'commit attribution'],
+  ['🧱 Physical-Aware', DATA.modules.physical.length, 'congestion→RTL'],
+];
+
+const overview = `
+  <div class="grid2">
+    <div class="card"><div class="sec-h">Findings by severity</div>${severityBars()}</div>
+    <div class="card"><div class="sec-h">Fixes by layer</div>${layerBars()}</div>
+  </div>
+  <div class="sec-h" style="margin-top:18px">Modules</div>
+  <div class="kpis" style="grid-template-columns:repeat(5,1fr)">
+    ${modCards.map(([t,n,s])=>`<div class="kpi"><div style="font-weight:700;font-size:13px">${t}</div>
+      <div class="n" style="font-size:28px">${n}</div><div class="l">${s}</div></div>`).join('')}
+  </div>`;
+
+function ppaPanel(){
+  const domains=['all',...new Set(DATA.ppa.map(x=>x.domain))];
+  return `<div class="filters" id="ppaF">${domains.map((d,i)=>
+    `<div class="chip ${i===0?'active':''}" data-d="${d}">${d}</div>`).join('')}</div>
+    <div id="ppaList">${DATA.ppa.map(itemCard).join('')}</div>`;
+}
+function modPanel(key){ return DATA.modules[key].map(itemCard).join('') || '<div class="card">No items.</div>'; }
+function upfPanel(){
+  const chk = DATA.upf_checklist.map(c=>{
+    const pass=c.status.includes('PASS');
+    return `<div class="chk"><span class="st ${pass?'pass':'fail'}">${pass?'✅ PASS':'❌ FAIL'}</span>
+      <div><b>${esc(c.label)}</b></div></div>`;}).join('');
+  return `<div class="sec-h">Signoff checklist</div><div class="checklist">${chk}</div>
+    <div class="sec-h" style="margin-top:14px">Findings</div>${modPanel('upf')}`;
+}
+
+const PANEL_HTML = {
+  overview, ppa:ppaPanel(), promotion:modPanel('promotion'),
+  upf:upfPanel(), regression:modPanel('regression')||'<div class="card">No regressions.</div>',
+  physical:modPanel('physical'),
+};
+panelsEl.innerHTML = TABS.map((t,i)=>
+  `<div class="panel ${i===0?'active':''}" data-p="${t.id}">${PANEL_HTML[t.id]}</div>`).join('');
+
+// interactions
+tabsEl.addEventListener('click',e=>{
+  const t=e.target.closest('.tab'); if(!t)return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.dataset.p===t.dataset.t));
+});
+panelsEl.addEventListener('click',e=>{
+  const c=e.target.closest('#ppaF .chip'); if(!c)return;
+  document.querySelectorAll('#ppaF .chip').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active');
+  const d=c.dataset.d;
+  document.querySelectorAll('#ppaList .card').forEach(card=>{
+    card.style.display=(d==='all'||card.dataset.domain===d)?'':'none';});
+});
+</script>
+</body>
+</html>
