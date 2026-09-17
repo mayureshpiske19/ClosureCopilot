@@ -89,7 +89,7 @@ for b in bullets:
 save(img, 2)
 
 # F3 — architecture
-img = new(); d = ImageDraw.Draw(img); header(d, "One copilot · 9 agents · any backend report", BLUE)
+img = new(); d = ImageDraw.Draw(img); header(d, "One copilot · 7 agents · any backend report", BLUE)
 arch = Image.open("docs/architecture.png").convert("RGB")
 scale = min(1720 / arch.width, 820 / arch.height)
 arch = arch.resize((int(arch.width * scale), int(arch.height * scale)))
@@ -98,7 +98,7 @@ save(img, 3)
 
 # F4 — fix-layer routing
 img = new(); d = ImageDraw.Draw(img); header(d, "The core idea: Fix-Layer Routing", PURPLE)
-para(d, 70, 210, "For every issue, it decides WHERE the fix belongs — RTL · SDC · UPF · synth-setup.",
+para(d, 70, 210, "For every issue, it decides WHERE the fix belongs — RTL · SDC · UPF · Synth · Formal.",
      B(40), DARK, 1780, 55)
 rrect(d, [70, 340, 940, 720], 24, LIGHT)
 d.text((110, 375), "Example 1 — fix in SDC (not RTL)", font=B(38), fill=BLUE)
@@ -114,7 +114,7 @@ para(d, 70, 800, "Every fix ships with a corrected, copy-paste snippet + a cross
      B(38), DARK, 1780, 52)
 save(img, 4)
 
-# F5 — five modules
+# F5 — five capabilities
 img = new(); d = ImageDraw.Draw(img); header(d, "Five capabilities, one dashboard", GREEN)
 mods = [
     ("PPA Analyzer", "Ranks issues and routes each fix to RTL / SDC / UPF with a snippet + trade-off.", BLUE),

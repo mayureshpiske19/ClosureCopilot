@@ -95,7 +95,7 @@ for b in bullets:
     y += 1.15
 
 # ---- Slide 3 : What it does (architecture) ----
-s = slide(); bg(s); header(s, "One copilot · 9 agents · any backend report")
+s = slide(); bg(s); header(s, "One copilot · 7 agents · any backend report")
 try:
     # center the diagram, sized to fit under the header without overlapping the footer
     s.shapes.add_picture("docs/architecture.png", Inches(2.35), Inches(1.28),
@@ -106,7 +106,7 @@ except Exception as e:
 # ---- Slide 4 : Fix-layer routing ----
 s = slide(); bg(s); header(s, "The core idea: Fix-Layer Routing", PURPLE)
 text(s, Inches(0.7), Inches(1.4), Inches(12), Inches(0.7),
-     [("For every issue, it decides WHERE the fix belongs — RTL · SDC · UPF · synthesis-setup.",
+     [("For every issue, it decides WHERE the fix belongs — RTL · SDC · UPF · Synth · Formal.",
        20, DARK, True)])
 # example cards
 rect(s, Inches(0.7), Inches(2.4), Inches(5.8), Inches(2.4), LIGHT)

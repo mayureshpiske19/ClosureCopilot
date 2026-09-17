@@ -23,19 +23,19 @@ SCENES = [
             "reports. The hard part isn't reading a number; it's the judgment. Is this a real "
             "logic bug you fix in R-T-L, or just a missing constraint? That instinct lives in "
             "a few senior engineers' heads, and it doesn't scale."),
-    ("s03", "Closure Copilot captures that instinct. A supervisor agent directs nine "
-            "specialists. Parsers read any tool's output — timing, synthesis, power, area, "
-            "U-P-F, S-D-C, even congestion. And every answer is grounded in two knowledge "
-            "bases: proven P-P-A methodology, and a living memory of your specific chip."),
-    ("s04", "Its core skill is fix-layer routing. A setup failure on a configuration path? "
-            "It's sampled once per write, so the fix is a multi-cycle constraint in S-D-C, "
-            "not a logic change. A deep combinational path? That goes back to R-T-L to "
-            "pipeline. Every recommendation comes with a ready-to-paste snippet, and its "
-            "P-P-A trade-off."),
-    ("s05", "And it goes further. It promotes block constraints up to the top. It signs off "
-            "power intent — isolation, retention, and clock gating. It compares two runs and "
-            "points to the change that caused a regression. And it turns physical congestion "
-            "into concrete R-T-L hints."),
+    ("s03", "Closure Copilot captures that instinct. A supervisor directs seven specialist "
+            "agents across three groups — collaterals, P-P-A, and equivalence. Parsers read "
+            "any tool's output — timing, synthesis, power, area, U-P-F, S-D-C, and formal "
+            "L-E-C — grounded in two knowledge bases: proven P-P-A methodology, and a living "
+            "memory of your chip."),
+    ("s04", "Its core skill is fix-layer routing. A setup failure on a quasi-static config "
+            "path is a multi-cycle constraint in S-D-C, not a logic change. A deep "
+            "combinational path goes back to R-T-L to pipeline. And a formal non-equivalence "
+            "from an intended clock-gating change is fixed in the formal setup, not R-T-L. "
+            "Every fix ships with a ready-to-paste snippet and its P-P-A trade-off."),
+    ("s05", "And three closure modules go further. It promotes block constraints up to the "
+            "top. It signs off power intent — isolation, retention, and clock gating. And it "
+            "compares two runs and points to the change that caused a regression."),
     ("s06", "Under the hood: Python, a Streamlit dashboard, and Azure Open A-I — with a fully "
             "offline mode, so it runs anywhere, and the demo never breaks."),
     ("s07", "No other tool ties these together — routing, constraint promotion, and "
